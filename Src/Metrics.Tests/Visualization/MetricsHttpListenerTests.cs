@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -26,7 +25,7 @@ namespace Metrics.Tests.Visualization
             var listener = await StartListener("HttpEndpointCanBeDisposed");
             listener.Dispose();
         }
-        
+
         [Fact]
         public async Task MetricsHttpListener_CanBeDoubleDisposed()
         {
@@ -43,7 +42,7 @@ namespace Metrics.Tests.Visualization
             {
                 listener.Prefixes.Add(Endpoint(endpoint));
                 listener.Start();
-                
+
                 var result = await StartListener(endpoint);
                 result.Should().BeNull();
             }
@@ -59,13 +58,15 @@ namespace Metrics.Tests.Visualization
                 listener.Start();
 
                 var loggedAnError = false;
-                using (var config = Metric.Config)
+
+                using (var config = CreateConfig())
                 {
                     config.WithErrorHandler((exception, s) => { loggedAnError = true; }, true);
                     config.WithErrorHandler((exception) => { loggedAnError = true; }, true);
 
                     await StartListener(endpoint);
                 }
+
                 Assert.True(loggedAnError);
                 listener.Close();
             }
@@ -75,10 +76,16 @@ namespace Metrics.Tests.Visualization
         [Fact]
         public void MetricsHttpListener_MetricsConfig_SecondCallToWithHttpEndportDoesNotThrow()
         {
-            using (var config = Metric.Config.WithHttpEndpoint("http://localhost:58888/metricstest/HttpListenerTests/sameendpoint/"))
+            using (var config = CreateConfig().WithHttpEndpoint("http://localhost:58888/metricstest/HttpListenerTests/sameendpoint/"))
             {
                 config.WithHttpEndpoint("http://localhost:58888/metricstest/HttpListenerTests/sameendpoint/");
             }
+        }
+
+        private static MetricsConfig CreateConfig()
+        {
+            var context = new DefaultMetricsContext("http-listener-tests");
+            return new MetricsConfig(context);
         }
     }
 }
