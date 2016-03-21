@@ -1,6 +1,8 @@
-###0.3.4-pre / 2015-07-26
+###0.3.4-pre / 2016-03-22
 * support multiple, separate http endpoints
 * initialize http endpoints async
+* fixed compatibility with elasticsearch 2.x
+* global context name can be retrieved from runtime environment
 
 ###0.3.3-pre / 2015-06-300
 * introduce configurable Default sampling type
