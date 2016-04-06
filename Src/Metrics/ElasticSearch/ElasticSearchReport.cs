@@ -8,6 +8,9 @@ using Metrics.Reporters;
 using Metrics.Utils;
 using System.Threading.Tasks;
 using Metrics.Logging;
+using System.Runtime.Serialization.Json;
+using System.IO;
+using System.Text;
 
 namespace Metrics.ElasticSearch
 {
@@ -17,7 +20,7 @@ namespace Metrics.ElasticSearch
 
         private readonly Uri elasticSearchUri;
         private readonly string elasticSearchIndex;
-        private readonly Task<ElasticSearchNodeInfo> nodeInfoTask;
+        private readonly bool replaceDotsOnFieldNames;
 
         private class ESDocument
         {
@@ -33,11 +36,26 @@ namespace Metrics.ElasticSearch
 
         private List<ESDocument> data = null;
 
-        public ElasticSearchReport(Uri elasticSearchUri, string elasticSearchIndex, Task<ElasticSearchNodeInfo> nodeInfoTask)
+        public ElasticSearchReport(Uri elasticSearchUri, string elasticSearchIndex, Uri nodeInfoUri)
         {
             this.elasticSearchUri = elasticSearchUri;
             this.elasticSearchIndex = elasticSearchIndex;
-            this.nodeInfoTask = nodeInfoTask;
+            using (var client = new WebClient())
+            {
+                try
+                {
+                    var json = client.DownloadString(nodeInfoUri);
+                    var deserializer = new DataContractJsonSerializer(typeof(ElasticSearchNodeInfo));
+                    MemoryStream stream = new MemoryStream(Encoding.UTF8.GetBytes(json));
+                    var nodeInfo = (ElasticSearchNodeInfo)deserializer.ReadObject(stream);
+                    replaceDotsOnFieldNames = nodeInfo.MajorVersionNumber >= 2;
+                }
+                catch (Exception ex)
+                {
+                    log.WarnException("Unable to get ElasticSearch version. Field names with dots won't be replaced.", ex);
+                    replaceDotsOnFieldNames = false;
+                }
+            }
         }
 
         protected override void StartReport(string contextName)
@@ -167,27 +185,7 @@ namespace Metrics.ElasticSearch
 
         private string AdjustDottedFieldNames(string fieldName)
         {
-            if (!nodeInfoTask.IsCompleted)
-            {
-                try
-                {
-                    nodeInfoTask.Wait();
-                }
-                catch (AggregateException ex)
-                {
-                    log.WarnException("Unable to get ElasticSearch version. Field names with dots won't be replaced.", ex);
-                }
-            }
-            if (nodeInfoTask.IsFaulted)
-            {
-                return fieldName;
-            }
-            else
-            {
-                ElasticSearchNodeInfo nodeInfo = nodeInfoTask.Result;
-                bool mustReplaceDots = nodeInfo.MajorVersionNumber >= 2;
-                return mustReplaceDots ? fieldName.Replace(".", "_") : fieldName;
-            }
+            return replaceDotsOnFieldNames ? fieldName.Replace(".", "_") : fieldName;
         }
 
         protected override void ReportHealth(HealthStatus status)
