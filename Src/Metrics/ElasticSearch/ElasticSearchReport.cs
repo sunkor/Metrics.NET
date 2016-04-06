@@ -6,13 +6,18 @@ using Metrics.Json;
 using Metrics.MetricData;
 using Metrics.Reporters;
 using Metrics.Utils;
+using System.Threading.Tasks;
+using Metrics.Logging;
 
 namespace Metrics.ElasticSearch
 {
     public class ElasticSearchReport : BaseReport
     {
+        private static readonly ILog log = LogProvider.GetCurrentClassLogger();
+
         private readonly Uri elasticSearchUri;
         private readonly string elasticSearchIndex;
+        private readonly Task<ElasticSearchNodeInfo> nodeInfoTask;
 
         private class ESDocument
         {
@@ -28,12 +33,12 @@ namespace Metrics.ElasticSearch
 
         private List<ESDocument> data = null;
 
-        public ElasticSearchReport(Uri elasticSearchUri, string elasticSearchIndex)
+        public ElasticSearchReport(Uri elasticSearchUri, string elasticSearchIndex, Task<ElasticSearchNodeInfo> nodeInfoTask)
         {
             this.elasticSearchUri = elasticSearchUri;
             this.elasticSearchIndex = elasticSearchIndex;
+            this.nodeInfoTask = nodeInfoTask;
         }
-
 
         protected override void StartReport(string contextName)
         {
@@ -128,7 +133,7 @@ namespace Metrics.ElasticSearch
                 new JsonProperty("Percentile 95%",value.Percentile95),
                 new JsonProperty("Percentile 98%",value.Percentile98),
                 new JsonProperty("Percentile 99%",value.Percentile99),
-                new JsonProperty("Percentile 99_9%" ,value.Percentile999),
+                new JsonProperty(AdjustDottedFieldNames("Percentile 99.9%"), value.Percentile999),
                 new JsonProperty("Sample Size", value.SampleSize)
             });
         }
@@ -155,9 +160,34 @@ namespace Metrics.ElasticSearch
                 new JsonProperty("Percentile 95%",value.Histogram.Percentile95),
                 new JsonProperty("Percentile 98%",value.Histogram.Percentile98),
                 new JsonProperty("Percentile 99%",value.Histogram.Percentile99),
-                new JsonProperty("Percentile 99_9%" ,value.Histogram.Percentile999),
+                new JsonProperty(AdjustDottedFieldNames("Percentile 99.9%"), value.Histogram.Percentile999),
                 new JsonProperty("Sample Size", value.Histogram.SampleSize)
             });
+        }
+
+        private string AdjustDottedFieldNames(string fieldName)
+        {
+            if (!nodeInfoTask.IsCompleted)
+            {
+                try
+                {
+                    nodeInfoTask.Wait();
+                }
+                catch (AggregateException ex)
+                {
+                    log.WarnException("Unable to get ElasticSearch version. Field names with dots won't be replaced.", ex);
+                }
+            }
+            if (nodeInfoTask.IsFaulted)
+            {
+                return fieldName;
+            }
+            else
+            {
+                ElasticSearchNodeInfo nodeInfo = nodeInfoTask.Result;
+                bool mustReplaceDots = nodeInfo.MajorVersionNumber >= 2;
+                return mustReplaceDots ? fieldName.Replace(".", "_") : fieldName;
+            }
         }
 
         protected override void ReportHealth(HealthStatus status)
