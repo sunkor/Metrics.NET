@@ -21,6 +21,8 @@ namespace Metrics.ElasticSearch
         private readonly Uri elasticSearchUri;
         private readonly string elasticSearchIndex;
         private readonly bool replaceDotsOnFieldNames;
+        ElasticReportsConfig.RollingIndex rollingIndex;
+        static readonly string __hostName = System.Net.Dns.GetHostName();
 
         private class ESDocument
         {
@@ -36,10 +38,12 @@ namespace Metrics.ElasticSearch
 
         private List<ESDocument> data = null;
 
-        public ElasticSearchReport(Uri elasticSearchUri, string elasticSearchIndex, Uri nodeInfoUri)
+
+        public ElasticSearchReport(Uri elasticSearchUri, string elasticSearchIndex, Uri nodeInfoUri, ElasticReportsConfig.RollingIndex rollingIndex = ElasticReportsConfig.RollingIndex.None)
         {
             this.elasticSearchUri = elasticSearchUri;
             this.elasticSearchIndex = elasticSearchIndex;
+            this.rollingIndex = rollingIndex;
             using (var client = new WebClient())
             {
                 try
@@ -55,6 +59,20 @@ namespace Metrics.ElasticSearch
                     log.WarnException("Unable to get ElasticSearch version. Field names with dots won't be replaced.", ex);
                     replaceDotsOnFieldNames = false;
                 }
+            }
+        }
+
+        string GetIndex()
+        {
+            switch (rollingIndex)
+            {
+                case ElasticReportsConfig.RollingIndex.Daily:
+                    return string.Format("{0}-{1}", elasticSearchIndex, DateTime.UtcNow.ToString("yyyy-MM-dd"));
+                case ElasticReportsConfig.RollingIndex.Monthly:
+                    return string.Format("{0}-{1}", elasticSearchIndex, DateTime.UtcNow.ToString("yyyy-MM"));
+                case ElasticReportsConfig.RollingIndex.None:
+                default:
+                    return elasticSearchIndex;
             }
         }
 
@@ -78,12 +96,13 @@ namespace Metrics.ElasticSearch
         {
             this.data.Add(new ESDocument
             {
-                Index = this.elasticSearchIndex,
+                Index = GetIndex(),
                 Type = type,
                 Object = new JsonObject(new[] { 
                          new JsonProperty("Timestamp", Clock.FormatTimestamp(this.CurrentContextTimestamp)),
                          new JsonProperty("Type",type),
                          new JsonProperty("Name",name),
+                         new JsonProperty("ServerName",__hostName),
                          new JsonProperty("Unit", unit.ToString()),
                          new JsonProperty("Tags", tags.Tags)
                      }.Concat(properties))
