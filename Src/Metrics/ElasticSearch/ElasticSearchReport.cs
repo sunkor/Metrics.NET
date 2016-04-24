@@ -1,28 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.Serialization.Json;
+using System.Text;
 using Metrics.Json;
+using Metrics.Logging;
 using Metrics.MetricData;
 using Metrics.Reporters;
 using Metrics.Utils;
-using System.Threading.Tasks;
-using Metrics.Logging;
-using System.Runtime.Serialization.Json;
-using System.IO;
-using System.Text;
 
 namespace Metrics.ElasticSearch
 {
     public class ElasticSearchReport : BaseReport
     {
         private static readonly ILog log = LogProvider.GetCurrentClassLogger();
+        private static readonly string hostName = Dns.GetHostName();
 
         private readonly Uri elasticSearchUri;
         private readonly string elasticSearchIndex;
         private readonly bool replaceDotsOnFieldNames;
-        ElasticReportsConfig.RollingIndex rollingIndex;
-        static readonly string __hostName = System.Net.Dns.GetHostName();
+        private readonly RollingIndexType rollingIndexType;
 
         private class ESDocument
         {
@@ -39,11 +38,11 @@ namespace Metrics.ElasticSearch
         private List<ESDocument> data;
 
 
-        public ElasticSearchReport(Uri elasticSearchUri, string elasticSearchIndex, Uri nodeInfoUri, ElasticReportsConfig.RollingIndex rollingIndex = ElasticReportsConfig.RollingIndex.None)
+        public ElasticSearchReport(Uri elasticSearchUri, string elasticSearchIndex, Uri nodeInfoUri, RollingIndexType rollingIndexType = RollingIndexType.None)
         {
             this.elasticSearchUri = elasticSearchUri;
             this.elasticSearchIndex = elasticSearchIndex;
-            this.rollingIndex = rollingIndex;
+            this.rollingIndexType = rollingIndexType;
             using (var client = new WebClient())
             {
                 try
@@ -59,20 +58,6 @@ namespace Metrics.ElasticSearch
                     log.WarnException("Unable to get ElasticSearch version. Field names with dots won't be replaced.", ex);
                     replaceDotsOnFieldNames = false;
                 }
-            }
-        }
-
-        string GetIndex()
-        {
-            switch (rollingIndex)
-            {
-                case ElasticReportsConfig.RollingIndex.Daily:
-                    return string.Format("{0}-{1}", elasticSearchIndex, DateTime.UtcNow.ToString("yyyy-MM-dd"));
-                case ElasticReportsConfig.RollingIndex.Monthly:
-                    return string.Format("{0}-{1}", elasticSearchIndex, DateTime.UtcNow.ToString("yyyy-MM"));
-                case ElasticReportsConfig.RollingIndex.None:
-                default:
-                    return elasticSearchIndex;
             }
         }
 
@@ -102,11 +87,25 @@ namespace Metrics.ElasticSearch
                          new JsonProperty("Timestamp", Clock.FormatTimestamp(this.CurrentContextTimestamp)),
                          new JsonProperty("Type",type),
                          new JsonProperty("Name",name),
-                         new JsonProperty("ServerName",__hostName),
+                         new JsonProperty("ServerName",hostName),
                          new JsonProperty("Unit", unit.ToString()),
                          new JsonProperty("Tags", tags.Tags)
                      }.Concat(properties))
             });
+        }
+
+        private string GetIndex()
+        {
+            switch (rollingIndexType)
+            {
+                case RollingIndexType.Daily:
+                    return $@"{elasticSearchIndex}-{DateTime.UtcNow.ToString("yyyy-MM-dd")}";
+                case RollingIndexType.Monthly:
+                    return $@"{elasticSearchIndex}-{DateTime.UtcNow.ToString("yyyy-MM")}";
+                case RollingIndexType.None:
+                default:
+                    return elasticSearchIndex;
+            }
         }
 
         protected override void ReportGauge(string name, double value, Unit unit, MetricTags tags)
