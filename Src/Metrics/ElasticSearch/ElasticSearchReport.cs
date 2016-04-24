@@ -1,18 +1,28 @@
-﻿using Metrics.Json;
-using Metrics.MetricData;
-using Metrics.Reporters;
-using Metrics.Utils;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using Metrics.Json;
+using Metrics.MetricData;
+using Metrics.Reporters;
+using Metrics.Utils;
+using System.Threading.Tasks;
+using Metrics.Logging;
+using System.Runtime.Serialization.Json;
+using System.IO;
+using System.Text;
 
 namespace Metrics.ElasticSearch
 {
     public class ElasticSearchReport : BaseReport
     {
+        private static readonly ILog log = LogProvider.GetCurrentClassLogger();
+
         private readonly Uri elasticSearchUri;
         private readonly string elasticSearchIndex;
+        private readonly bool replaceDotsOnFieldNames;
+        ElasticReportsConfig.RollingIndex rollingIndex;
+        static readonly string __hostName = System.Net.Dns.GetHostName();
 
         private class ESDocument
         {
@@ -28,12 +38,43 @@ namespace Metrics.ElasticSearch
 
         private List<ESDocument> data;
 
-        public ElasticSearchReport(Uri elasticSearchUri, string elasticSearchIndex)
+
+        public ElasticSearchReport(Uri elasticSearchUri, string elasticSearchIndex, Uri nodeInfoUri, ElasticReportsConfig.RollingIndex rollingIndex = ElasticReportsConfig.RollingIndex.None)
         {
             this.elasticSearchUri = elasticSearchUri;
             this.elasticSearchIndex = elasticSearchIndex;
+            this.rollingIndex = rollingIndex;
+            using (var client = new WebClient())
+            {
+                try
+                {
+                    var json = client.DownloadString(nodeInfoUri);
+                    var deserializer = new DataContractJsonSerializer(typeof(ElasticSearchNodeInfo));
+                    MemoryStream stream = new MemoryStream(Encoding.UTF8.GetBytes(json));
+                    var nodeInfo = (ElasticSearchNodeInfo)deserializer.ReadObject(stream);
+                    replaceDotsOnFieldNames = nodeInfo.MajorVersionNumber >= 2;
+                }
+                catch (Exception ex)
+                {
+                    log.WarnException("Unable to get ElasticSearch version. Field names with dots won't be replaced.", ex);
+                    replaceDotsOnFieldNames = false;
+                }
+            }
         }
 
+        string GetIndex()
+        {
+            switch (rollingIndex)
+            {
+                case ElasticReportsConfig.RollingIndex.Daily:
+                    return string.Format("{0}-{1}", elasticSearchIndex, DateTime.UtcNow.ToString("yyyy-MM-dd"));
+                case ElasticReportsConfig.RollingIndex.Monthly:
+                    return string.Format("{0}-{1}", elasticSearchIndex, DateTime.UtcNow.ToString("yyyy-MM"));
+                case ElasticReportsConfig.RollingIndex.None:
+                default:
+                    return elasticSearchIndex;
+            }
+        }
 
         protected override void StartReport(string contextName)
         {
@@ -55,12 +96,13 @@ namespace Metrics.ElasticSearch
         {
             this.data.Add(new ESDocument
             {
-                Index = this.elasticSearchIndex,
+                Index = GetIndex(),
                 Type = type,
                 Object = new JsonObject(new[] {
                          new JsonProperty("Timestamp", Clock.FormatTimestamp(this.CurrentContextTimestamp)),
                          new JsonProperty("Type",type),
                          new JsonProperty("Name",name),
+                         new JsonProperty("ServerName",__hostName),
                          new JsonProperty("Unit", unit.ToString()),
                          new JsonProperty("Tags", tags.Tags)
                      }.Concat(properties))
@@ -128,7 +170,7 @@ namespace Metrics.ElasticSearch
                 new JsonProperty("Percentile 95%",value.Percentile95),
                 new JsonProperty("Percentile 98%",value.Percentile98),
                 new JsonProperty("Percentile 99%",value.Percentile99),
-                new JsonProperty("Percentile 99_9%" ,value.Percentile999),
+                new JsonProperty(AdjustDottedFieldNames("Percentile 99.9%"), value.Percentile999),
                 new JsonProperty("Sample Size", value.SampleSize)
             });
         }
@@ -155,9 +197,14 @@ namespace Metrics.ElasticSearch
                 new JsonProperty("Percentile 95%",value.Histogram.Percentile95),
                 new JsonProperty("Percentile 98%",value.Histogram.Percentile98),
                 new JsonProperty("Percentile 99%",value.Histogram.Percentile99),
-                new JsonProperty("Percentile 99_9%" ,value.Histogram.Percentile999),
+                new JsonProperty(AdjustDottedFieldNames("Percentile 99.9%"), value.Histogram.Percentile999),
                 new JsonProperty("Sample Size", value.Histogram.SampleSize)
             });
+        }
+
+        private string AdjustDottedFieldNames(string fieldName)
+        {
+            return replaceDotsOnFieldNames ? fieldName.Replace(".", "_") : fieldName;
         }
 
         protected override void ReportHealth(HealthStatus status)

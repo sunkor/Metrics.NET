@@ -43,6 +43,7 @@
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
@@ -89,7 +90,9 @@
     <Compile Include="Core\DefaultDataProvider.cs" />
     <Compile Include="Core\DefaultRegistryDataProvider.cs" />
     <Compile Include="Core\SimpleMeter.cs" />
+    <Compile Include="ElasticSearch\ElasticReportsConfig.cs" />
     <Compile Include="ElasticSearch\ElasticSearchConfigExtensions.cs" />
+    <Compile Include="ElasticSearch\ElasticSearchNodeInfo.cs" />
     <Compile Include="ElasticSearch\ElasticSearchReport.cs" />
     <Compile Include="Graphite\PickleGraphiteSender.cs" />
     <Compile Include="Graphite\PickleJar.cs" />
