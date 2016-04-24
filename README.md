@@ -13,6 +13,8 @@ Metrics.NET - a .NET Port, with lots of additional functionality, of the awesome
 
 A lot more [information and documentation are available in the wiki](https://github.com/Recognos/Metrics.NET/wiki).
 
+[Changelog](https://github.com/Recognos/Metrics.NET/blob/master/CHANGELOG.md)
+
 ## License
 This library will always keep the same license as the original [Java Metrics library](https://github.com/dropwizard/metrics) (as long as its an open source, permisive license). This port is also inspired and contains some code from [Daniel Crenna's port](https://github.com/danielcrenna/metrics-net).
 
