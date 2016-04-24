@@ -5,8 +5,10 @@
 * fixed string formatting in HealthCheckResult (@bregger)
 
 First 0.3.x stable release, contains all changes in previous 0.3.x-pre versions.
-Note: The HDR sampling implementation is in beta stage, some issues might still be present.
-Note: For 0.2.x users, SamplingType.FavourRecent has been renamed to SamplingType.ExponentiallyDecaying.
+
+Note: The HDR sampling implementation is in beta stage, some issues might still be present. The default sampling type remains ExponentiallyDecaying for now.
+
+Note for 0.2.x users: SamplingType.FavourRecent has been renamed to SamplingType.ExponentiallyDecaying.
 
 ###0.3.4-pre / 2016-03-22
 * support multiple, separate http endpoints
