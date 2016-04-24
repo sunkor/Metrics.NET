@@ -1,3 +1,12 @@
+###0.3.5 / 2016-04-24
+* support rolling index for elasticsearch (@AmirSasson)
+* fixed backwards compatibility with elasticsearch (@andrepnh)
+* fixed graphite report sending incorrect values for meters (@AlistairClark7)
+* fixed string formatting in HealthCheckResult (@bregger)
+First 0.3.x stable release, contains all changes in previous 0.3.x-pre versions.
+Note: The HDR sampling implementation is in beta stage, some issues might still be present.
+Note: For 0.2.x users, SamplingType.FavourRecent has been renamed to SamplingType.ExponentiallyDecaying.
+
 ###0.3.4-pre / 2016-03-22
 * support multiple, separate http endpoints
 * initialize http endpoints async
