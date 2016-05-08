@@ -208,6 +208,19 @@ namespace Metrics.ElasticSearch
 
         protected override void ReportHealth(HealthStatus status)
         {
+            var props = new List<JsonProperty>{
+                new JsonProperty("IsHealthy", status.IsHealthy),
+                new JsonProperty("RegisteredChecksCount", status.Results.Count()),                
+            };
+            foreach (var healthResult in status.Results)
+            {
+                props.Add(new JsonProperty(healthResult.Name, new JsonObject(
+                    new[] {
+                        new JsonProperty("IsHealthy",healthResult.Check.IsHealthy),
+                        new JsonProperty("Message",healthResult.Check.Message) })));
+            }
+
+            Pack("Health", "HealthStatus", Unit.None, MetricTags.None, props);
         }
     }
 }
