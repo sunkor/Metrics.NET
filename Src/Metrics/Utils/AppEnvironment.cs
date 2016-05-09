@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Metrics.Logging;
+using Metrics.MetricData;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using Metrics.Logging;
-using Metrics.MetricData;
+using System.Reflection;
 
 namespace Metrics.Utils
 {
@@ -27,6 +28,10 @@ namespace Metrics.Utils
                 yield return new EnvironmentEntry("HostName", SafeGetString(Dns.GetHostName));
                 yield return new EnvironmentEntry("IPAddress", SafeGetString(GetIpAddress));
                 yield return new EnvironmentEntry("LocalTime", Clock.FormatTimestamp(DateTime.Now));
+
+                var entryAssemblyName = Assembly.GetEntryAssembly().GetName();
+                yield return new EnvironmentEntry("EntryAssemblyName", entryAssemblyName.Name);
+                yield return new EnvironmentEntry("EntryAssemblyVersion", entryAssemblyName.Version.ToString());
             }
         }
 
