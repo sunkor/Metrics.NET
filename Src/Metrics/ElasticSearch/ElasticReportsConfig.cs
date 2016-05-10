@@ -22,12 +22,21 @@ namespace Metrics.ElasticSearch
         Monthly
     }
 
+    /// <summary>
+    /// Configuration for using the elastic (elastic search) reporting
+    /// </summary>
     public class ElasticReportsConfig
     {
         public string Host { get; set; }
         public int Port { get; set; }
         public string Index { get; set; }
 
+        /// <summary>
+        /// Gets or sets the type of the rolling index.
+        /// </summary>
+        /// <value>
+        /// The type of the rolling index.
+        /// </value>
         public RollingIndexType RollingIndexType { get; set; }
         /// <summary>
         /// optional, provide this interface to be reflected on the health checks document reports
@@ -60,7 +69,19 @@ namespace Metrics.ElasticSearch
         public static ApplicationInfo Default = new ApplicationInfo();
         public string Name { get; private set; }
         public DateTime StartTime { get; private set; }
+        /// <summary>
+        /// Gets your application up time.
+        /// </summary>
+        /// <value>
+        /// Up time.
+        /// </value>
         public TimeSpan UpTime { get { return DateTime.UtcNow - StartTime; } }
+        /// <summary>
+        /// Gets the version.
+        /// </summary>
+        /// <value>
+        /// The your applicationversion.
+        /// </value>
         public string Version { get; private set; }
 
 
