@@ -1,7 +1,7 @@
-﻿using System;
-using Metrics.MetricData;
+﻿using Metrics.ElasticSearch;
 using Metrics.Samples;
 using Metrics.Utils;
+using System;
 
 namespace Metrics.SamplesConsole
 {
@@ -10,7 +10,6 @@ namespace Metrics.SamplesConsole
         static void Main(string[] args)
         {
             //Metric.CompletelyDisableMetrics();
-
             Metric.Config
                 .WithHttpEndpoint("http://localhost:1234/metrics/")
                 .WithHttpEndpoint("http://localhost:12345/metrics/")
@@ -22,7 +21,7 @@ namespace Metrics.SamplesConsole
                 //.WithTextFileReport(@"C:\temp\reports\metrics.txt", TimeSpan.FromSeconds(10))
                 //.WithGraphite(new Uri("net.udp://localhost:2003"), TimeSpan.FromSeconds(1))
                 //.WithInfluxDb("192.168.1.8", 8086, "admin", "admin", "metrics", TimeSpan.FromSeconds(1))
-                //.WithElasticSearch("192.168.1.8", 9200, "metrics", TimeSpan.FromSeconds(1))
+                .WithElasticSearch(new ElasticSearch.ElasticReportsConfig() { Host = "192.168.1.8", Port = 9200, Index = "metrics", RollingIndexType = ElasticSearch.RollingIndexType.Daily , ReportingApplication = ApplicationInfo.Default }, TimeSpan.FromSeconds(5))
                 );
 
             using (var scheduler = new ActionScheduler())

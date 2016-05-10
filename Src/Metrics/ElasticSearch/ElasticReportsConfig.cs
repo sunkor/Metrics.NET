@@ -51,9 +51,13 @@ namespace Metrics.ElasticSearch
             Name = name;
             Version = version;
         }
+
+       
+
         public ApplicationInfo() : this(Assembly.GetCallingAssembly().GetName().Name, Assembly.GetCallingAssembly().GetName().Version.ToString())
         { }
 
+        public static ApplicationInfo Default = new ApplicationInfo();
         public string Name { get; private set; }
         public DateTime StartTime { get; private set; }
         public TimeSpan UpTime { get { return DateTime.UtcNow - StartTime; } }

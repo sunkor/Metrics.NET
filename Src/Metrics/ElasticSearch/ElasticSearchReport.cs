@@ -71,11 +71,11 @@ namespace Metrics.ElasticSearch
         {
             switch (_reportConfig.RollingIndexType)
             {
-                case ElasticReportsConfig.RollingIndex.Daily:
-                    return string.Format("{0}-{1}", _reportConfig.Index, DateTime.UtcNow.ToString("yyyy-MM-dd"));
-                case ElasticReportsConfig.RollingIndex.Monthly:
-                    return string.Format("{0}-{1}", _reportConfig.Index, DateTime.UtcNow.ToString("yyyy-MM"));
-                case ElasticReportsConfig.RollingIndex.None:
+                case RollingIndexType.Daily:
+                    return $"{_reportConfig.Index}-{DateTime.UtcNow.ToString("yyyy-MM-dd")}";
+                case RollingIndexType.Monthly:
+                    return $"{_reportConfig.Index}-{DateTime.UtcNow.ToString("yyyy-MM")}";
+                case RollingIndexType.None:
                 default:
                     return _reportConfig.Index;
             }
