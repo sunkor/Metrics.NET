@@ -1,3 +1,8 @@
+###0.3.6 / 2016-05-29
+* fixed timer total time unit info in human readable report (@Liwoj)
+* support for reporting health checks to elasticsearch (@AmirSasson)
+* AppEnvironment now contains EntryAssembly name and version
+
 ###0.3.5 / 2016-04-24
 * support rolling index for elasticsearch (@AmirSasson)
 * fixed backwards compatibility with elasticsearch (@andrepnh)
