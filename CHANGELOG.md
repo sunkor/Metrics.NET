@@ -1,3 +1,6 @@
+###0.3.7 / 2016-05-31
+* fixed AppEnvironment.Current when Assembly.GetEntryAssembly() returns null
+
 ###0.3.6 / 2016-05-29
 * fixed timer total time unit info in human readable report (@Liwoj)
 * support for reporting health checks to elasticsearch (@AmirSasson)

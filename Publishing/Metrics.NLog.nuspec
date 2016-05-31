@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
 	<metadata>
 		<id>Metrics.NLog</id>
-		<version>0.3.6</version>
+		<version>0.3.7</version>
 		<title>Nancy.NLog</title>
     <authors>iulian.margarintescu, The Recognos Metrics.NET Team</authors>
     <owners>Iulian Margarintescu, The Recognos Metrics.NET Team</owners>
@@ -15,7 +15,7 @@
 		<iconUrl>http://www.erata.net/Metrics.NET/metrics_32.png</iconUrl>
 		<tags>logging, nlog, metrics, measurements, charts, timer, histogram, duration, graphite, health checks</tags>
 		<dependencies>
-			<dependency id="Metrics.NET" version="0.3.6" />
+			<dependency id="Metrics.NET" version="0.3.7" />
 			<dependency id="NLog" version="3.2" />
 		</dependencies>
 	</metadata>
