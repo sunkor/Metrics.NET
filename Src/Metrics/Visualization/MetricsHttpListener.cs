@@ -156,6 +156,21 @@ namespace Metrics.Visualization
             var urlPath = context.Request.RawUrl.Substring(this.prefixPath.Length)
                 .ToLowerInvariant();
 
+            if (TryProcessFixedEndpoints(context, urlPath))
+            {
+                return;
+            }
+
+            if (TryProcessDynamicEndpoints(context, urlPath))
+            {
+                return;
+            }
+
+            WriteNotFound(context);
+        }
+
+        private bool TryProcessFixedEndpoints(HttpListenerContext context, string urlPath)
+        {
             switch (urlPath)
             {
                 case "/":
@@ -192,15 +207,25 @@ namespace Metrics.Visualization
                 case "/ping":
                     WritePong(context);
                     break;
+                default:
+                    return false;
             }
 
+            return true;
+        }
+
+        private bool TryProcessDynamicEndpoints(HttpListenerContext context, string urlPath)
+        {
             foreach (var endpoint in this.endpointProvider())
             {
                 if (endpoint.Endpoint.Equals(urlPath, StringComparison.InvariantCultureIgnoreCase))
                 {
                     WriteEndpoint(endpoint, context);
+                    return true;
                 }
             }
+
+            return false;
         }
 
         private void WriteEndpoint(MetricsEndpoint endpoint, HttpListenerContext context)
