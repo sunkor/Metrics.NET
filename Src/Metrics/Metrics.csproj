@@ -126,6 +126,7 @@
     <Compile Include="RemoteMetrics\RemoteMetricsExtensions.cs" />
     <Compile Include="RemoteMetrics\RemoteMetricsContext.cs" />
     <Compile Include="Reporters\MetricsReport.cs" />
+    <Compile Include="Reporters\MetricsEndpointReports.cs" />
     <Compile Include="Sampling\ExponentiallyDecayingReservoir.cs" />
     <Compile Include="Core\HealthCheck.cs" />
     <Compile Include="Core\MetricsBuilder.cs" />
@@ -192,6 +193,7 @@
     <Compile Include="Utils\Scheduler.cs" />
     <Compile Include="Utils\TimeUnitExtensions.cs" />
     <Compile Include="Visualization\FlotWebApp.cs" />
+    <Compile Include="Visualization\MetricsEndpoint.cs" />
     <Compile Include="Visualization\MetricsHttpListener.cs" />
   </ItemGroup>
   <ItemGroup>
