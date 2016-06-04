@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -16,7 +17,7 @@ namespace Metrics.Tests.Visualization
         private static Task<MetricsHttpListener> StartListener(string endpoint)
         {
             var context = new TestContext();
-            return MetricsHttpListener.StartHttpListenerAsync(Endpoint(endpoint), context.DataProvider, () => new HealthStatus(), CancellationToken.None);
+            return MetricsHttpListener.StartHttpListenerAsync(Endpoint(endpoint), context.DataProvider, () => new HealthStatus(), () => Enumerable.Empty<MetricsEndpoint>(), CancellationToken.None);
         }
 
         [Fact]

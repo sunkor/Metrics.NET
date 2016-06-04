@@ -20,17 +20,18 @@ namespace Metrics
 
         private readonly MetricsContext context;
         private readonly MetricsReports reports;
+        private readonly MetricsEndpointReports endpointReports;
 
         private Func<HealthStatus> healthStatus;
 
         private readonly CancellationTokenSource httpEndpointCancellation = new CancellationTokenSource();
 
-        private readonly Dictionary<string,Task<MetricsHttpListener>> httpEndpoints = new Dictionary<string, Task<MetricsHttpListener>>();
+        private readonly Dictionary<string, Task<MetricsHttpListener>> httpEndpoints = new Dictionary<string, Task<MetricsHttpListener>>();
 
         private SamplingType defaultSamplingType = SamplingType.ExponentiallyDecaying;
 
         private bool isDisabled = MetricsConfig.GloballyDisabledMetrics;
-        
+
         /// <summary>
         /// Gets the currently configured default sampling type to use for histogram sampling.
         /// </summary>
@@ -51,6 +52,7 @@ namespace Metrics
             {
                 this.healthStatus = HealthChecks.GetStatus;
                 this.reports = new MetricsReports(this.context.DataProvider, this.healthStatus);
+                this.endpointReports = new MetricsEndpointReports();
                 this.context.Advanced.ContextDisabled += (s, e) =>
                 {
                     this.isDisabled = true;
@@ -82,10 +84,10 @@ namespace Metrics
                 return this;
             }
 
-            var endpoint = MetricsHttpListener.StartHttpListenerAsync(httpUriPrefix, this.context.DataProvider.WithFilter(filter), 
-                this.healthStatus, this.httpEndpointCancellation.Token, maxRetries);
-            this.httpEndpoints.Add(httpUriPrefix,endpoint);
-          
+            var endpoint = MetricsHttpListener.StartHttpListenerAsync(httpUriPrefix, this.context.DataProvider.WithFilter(filter),
+                this.healthStatus, () => this.endpointReports.Endpoints, this.httpEndpointCancellation.Token, maxRetries);
+            this.httpEndpoints.Add(httpUriPrefix, endpoint);
+
             return this;
         }
 
@@ -157,6 +159,16 @@ namespace Metrics
             if (!this.isDisabled)
             {
                 reportsConfig(this.reports);
+            }
+
+            return this;
+        }
+
+        public MetricsConfig WithEndpointReporting(Action<MetricsEndpointReports> reportsConfig)
+        {
+            if (!this.isDisabled)
+            {
+                reportsConfig(this.endpointReports);
             }
 
             return this;
@@ -296,7 +308,7 @@ namespace Metrics
             try
             {
                 var isDisabled = ConfigurationManager.AppSettings["Metrics.CompletelyDisableMetrics"];
-                return !string.IsNullOrEmpty(isDisabled) && isDisabled.Equals("TRUE",StringComparison.OrdinalIgnoreCase);
+                return !string.IsNullOrEmpty(isDisabled) && isDisabled.Equals("TRUE", StringComparison.OrdinalIgnoreCase);
             }
             catch (Exception x)
             {

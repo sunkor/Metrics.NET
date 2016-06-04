@@ -1,9 +1,6 @@
 ﻿
-using Metrics.Json;
-using Metrics.Logging;
-using Metrics.MetricData;
-using Metrics.Reporters;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
@@ -11,7 +8,10 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-
+using Metrics.Json;
+using Metrics.Logging;
+using Metrics.MetricData;
+using Metrics.Reporters;
 
 namespace Metrics.Visualization
 {
@@ -25,6 +25,7 @@ namespace Metrics.Visualization
         private readonly MetricsDataProvider metricsDataProvider;
         private readonly Func<HealthStatus> healthStatus;
         private readonly string prefixPath;
+        private readonly Func<IEnumerable<MetricsEndpoint>> endpointProvider;
 
         private Task processingTask;
 
@@ -36,7 +37,7 @@ namespace Metrics.Visualization
         private static readonly Timer timer = Metric.Internal.Context("HTTP").Timer("Request", Unit.Requests);
         private static readonly Meter errors = Metric.Internal.Context("HTTP").Meter("Request Errors", Unit.Errors);
 
-        public MetricsHttpListener(string listenerUriPrefix, MetricsDataProvider metricsDataProvider, Func<HealthStatus> healthStatus, CancellationToken token)
+        public MetricsHttpListener(string listenerUriPrefix, MetricsDataProvider metricsDataProvider, Func<HealthStatus> healthStatus, Func<IEnumerable<MetricsEndpoint>> endpointProvider, CancellationToken token)
         {
             this.cts = CancellationTokenSource.CreateLinkedTokenSource(token);
 
@@ -45,10 +46,11 @@ namespace Metrics.Visualization
             this.httpListener.Prefixes.Add(listenerUriPrefix);
             this.metricsDataProvider = metricsDataProvider;
             this.healthStatus = healthStatus;
+            this.endpointProvider = endpointProvider;
         }
 
         public static Task<MetricsHttpListener> StartHttpListenerAsync(string httpUriPrefix, MetricsDataProvider dataProvider,
-            Func<HealthStatus> healthStatus, CancellationToken token, int maxRetries = 1)
+            Func<HealthStatus> healthStatus, Func<IEnumerable<MetricsEndpoint>> endpointProvider, CancellationToken token, int maxRetries = 1)
         {
             return Task.Factory.StartNew(async () =>
             {
@@ -58,7 +60,7 @@ namespace Metrics.Visualization
                 {
                     try
                     {
-                        listener = new MetricsHttpListener(httpUriPrefix, dataProvider, healthStatus, token);
+                        listener = new MetricsHttpListener(httpUriPrefix, dataProvider, healthStatus, endpointProvider, token);
                         listener.Start();
                         if (remainingRetries != maxRetries)
                         {
@@ -190,10 +192,20 @@ namespace Metrics.Visualization
                 case "/ping":
                     WritePong(context);
                     break;
-                default:
-                    WriteNotFound(context);
-                    break;
             }
+
+            foreach (var endpoint in this.endpointProvider())
+            {
+                if (endpoint.Endpoint.Equals(urlPath, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    WriteEndpoint(endpoint, context);
+                }
+            }
+        }
+
+        private void WriteEndpoint(MetricsEndpoint endpoint, HttpListenerContext context)
+        {
+            WriteString(context, endpoint.ProduceContent(), endpoint.ContentType);
         }
 
         private static void WriteHealthStatus(HttpListenerContext context, Func<HealthStatus> healthStatus)
