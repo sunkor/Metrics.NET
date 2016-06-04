@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace Metrics.Visualization
 {
@@ -8,9 +9,14 @@ namespace Metrics.Visualization
 
         public readonly string Endpoint;
         public readonly string ContentType;
+        public readonly Encoding Encoding;
         public string ProduceContent() => this.contentFactory();
 
         public MetricsEndpoint(string endpoint, Func<string> contentFactory, string contentType)
+            : this(endpoint, contentFactory, contentType, Encoding.UTF8) { }
+
+
+        public MetricsEndpoint(string endpoint, Func<string> contentFactory, string contentType, Encoding encoding)
         {
             if (contentFactory == null)
             {
@@ -22,8 +28,14 @@ namespace Metrics.Visualization
                 throw new ArgumentException("Invalid content type");
             }
 
+            if (encoding == null)
+            {
+                throw new ArgumentNullException("encoding");
+            }
+
             this.Endpoint = NormalizeEndpoint(endpoint);
             this.ContentType = contentType;
+            this.Encoding = encoding;
 
             this.contentFactory = contentFactory;
         }

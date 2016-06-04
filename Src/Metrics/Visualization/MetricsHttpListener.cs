@@ -230,7 +230,7 @@ namespace Metrics.Visualization
 
         private void WriteEndpoint(MetricsEndpoint endpoint, HttpListenerContext context)
         {
-            WriteString(context, endpoint.ProduceContent(), endpoint.ContentType);
+            WriteString(context, endpoint.ProduceContent(), endpoint.ContentType, 200, "OK", endpoint.Encoding);
         }
 
         private static void WriteHealthStatus(HttpListenerContext context, Func<HealthStatus> healthStatus)
@@ -295,7 +295,7 @@ namespace Metrics.Visualization
         }
 
         private static void WriteString(HttpListenerContext context, string data, string contentType,
-            int httpStatus = 200, string httpStatusDescription = "OK")
+            int httpStatus = 200, string httpStatusDescription = "OK", Encoding encoding = null)
         {
             AddCorsHeaders(context.Response);
             AddNoCacheHeaders(context.Response);
@@ -304,10 +304,12 @@ namespace Metrics.Visualization
             context.Response.StatusCode = httpStatus;
             context.Response.StatusDescription = httpStatusDescription;
 
+            var textEncoding = encoding ?? Encoding.UTF8;
+
             var acceptsGzip = AcceptsGzip(context.Request);
             if (!acceptsGzip)
             {
-                using (var writer = new StreamWriter(context.Response.OutputStream, Encoding.UTF8, 4096, true))
+                using (var writer = new StreamWriter(context.Response.OutputStream, textEncoding, 4096, true))
                 {
                     writer.Write(data);
                 }
@@ -316,7 +318,7 @@ namespace Metrics.Visualization
             {
                 context.Response.AddHeader("Content-Encoding", "gzip");
                 using (var gzip = new GZipStream(context.Response.OutputStream, CompressionMode.Compress, true))
-                using (var writer = new StreamWriter(gzip, Encoding.UTF8, 4096, true))
+                using (var writer = new StreamWriter(gzip, textEncoding, 4096, true))
                 {
                     writer.Write(data);
                 }

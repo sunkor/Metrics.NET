@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using Metrics.Visualization;
 
 namespace Metrics.Reports
@@ -10,13 +11,11 @@ namespace Metrics.Reports
 
         internal IReadOnlyList<MetricsEndpoint> Endpoints => this.endpoints;
 
-        public MetricsEndpointReports()
-        {
-        }
+        public MetricsEndpointReports() { }
 
-        public MetricsEndpointReports WithEndpointReport(string endpoint, Func<string> contentFactory)
+        public MetricsEndpointReports WithEndpointReport(string endpoint, Func<string> contentFactory, string contentType, Encoding encoding)
         {
-            var metricsEndpoint = new MetricsEndpoint(endpoint, contentFactory, "text/plain");
+            var metricsEndpoint = new MetricsEndpoint(endpoint, contentFactory, contentType, encoding);
             this.endpoints.Add(metricsEndpoint);
             return this;
         }
