@@ -228,7 +228,7 @@ namespace Metrics.Visualization
             return false;
         }
 
-        private void WriteEndpoint(MetricsEndpoint endpoint, HttpListenerContext context)
+        private static void WriteEndpoint(MetricsEndpoint endpoint, HttpListenerContext context)
         {
             WriteString(context, endpoint.ProduceContent(), endpoint.ContentType, 200, "OK", endpoint.Encoding);
         }

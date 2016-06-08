@@ -11,8 +11,6 @@ namespace Metrics.Reports
 
         internal IReadOnlyList<MetricsEndpoint> Endpoints => this.endpoints;
 
-        public MetricsEndpointReports() { }
-
         public MetricsEndpointReports WithEndpointReport(string endpoint, Func<string> contentFactory, string contentType, Encoding encoding)
         {
             var metricsEndpoint = new MetricsEndpoint(endpoint, contentFactory, contentType, encoding);

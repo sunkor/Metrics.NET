@@ -20,7 +20,7 @@ namespace Metrics.Visualization
         {
             if (contentFactory == null)
             {
-                throw new ArgumentNullException("contentFactory");
+                throw new ArgumentNullException(nameof(contentFactory));
             }
 
             if (string.IsNullOrWhiteSpace(contentType))
@@ -30,7 +30,7 @@ namespace Metrics.Visualization
 
             if (encoding == null)
             {
-                throw new ArgumentNullException("encoding");
+                throw new ArgumentNullException(nameof(encoding));
             }
 
             this.Endpoint = NormalizeEndpoint(endpoint);
@@ -40,7 +40,7 @@ namespace Metrics.Visualization
             this.contentFactory = contentFactory;
         }
 
-        private string NormalizeEndpoint(string endpoint)
+        private static string NormalizeEndpoint(string endpoint)
         {
             if (string.IsNullOrWhiteSpace(endpoint) || endpoint == "/")
             {
