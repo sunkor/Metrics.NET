@@ -17,7 +17,7 @@ namespace Metrics.SamplesConsole
                 .WithReporting(config => config
                     .WithConsoleReport(TimeSpan.FromSeconds(30)))
                 .WithEndpointReporting(config => config
-                    .WithEndpointReport("/test", () => "test", "text/plain", Encoding.UTF8));
+                    .WithEndpointReport("/test", (d, h) => "test", "text/plain", Encoding.UTF8));
 
             using (var scheduler = new ActionScheduler())
             {

@@ -127,6 +127,7 @@
     <Compile Include="RemoteMetrics\RemoteMetricsContext.cs" />
     <Compile Include="Reporters\MetricsReport.cs" />
     <Compile Include="Reporters\MetricsEndpointReports.cs" />
+    <Compile Include="Reporters\ReporterConfig.cs" />
     <Compile Include="Sampling\ExponentiallyDecayingReservoir.cs" />
     <Compile Include="Core\HealthCheck.cs" />
     <Compile Include="Core\MetricsBuilder.cs" />

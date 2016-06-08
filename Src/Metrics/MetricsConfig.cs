@@ -52,7 +52,7 @@ namespace Metrics
             {
                 this.healthStatus = HealthChecks.GetStatus;
                 this.reports = new MetricsReports(this.context.DataProvider, this.healthStatus);
-                this.endpointReports = new MetricsEndpointReports();
+                this.endpointReports = new MetricsEndpointReports(this.context.DataProvider, this.healthStatus);
                 this.context.Advanced.ContextDisabled += (s, e) =>
                 {
                     this.isDisabled = true;
