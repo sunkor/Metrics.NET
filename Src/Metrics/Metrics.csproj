@@ -195,6 +195,7 @@
     <Compile Include="Utils\TimeUnitExtensions.cs" />
     <Compile Include="Visualization\FlotWebApp.cs" />
     <Compile Include="Visualization\MetricsEndpoint.cs" />
+    <Compile Include="Visualization\MetricsEndpointResponse.cs" />
     <Compile Include="Visualization\MetricsHttpListener.cs" />
   </ItemGroup>
   <ItemGroup>

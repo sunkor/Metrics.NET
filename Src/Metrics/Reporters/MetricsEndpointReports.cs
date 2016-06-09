@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Net;
 using Metrics.MetricData;
 using Metrics.Visualization;
 
@@ -21,9 +21,10 @@ namespace Metrics.Reports
             this.healthStatus = healthStatus;
         }
 
-        public MetricsEndpointReports WithEndpointReport(string endpoint, Func<MetricsData, Func<HealthStatus>, string> contentFactory, string contentType, Encoding encoding)
+        public MetricsEndpointReports WithEndpointReport(string endpoint, Func<MetricsData, Func<HealthStatus>, HttpListenerContext, MetricsEndpointResponse> responseFactory, MetricsFilter filter = null)
         {
-            var metricsEndpoint = new MetricsEndpoint(endpoint, () => contentFactory(this.metricsDataProvider.CurrentMetricsData, this.healthStatus), contentType, encoding);
+            var provider = this.metricsDataProvider.WithFilter(filter);
+            var metricsEndpoint = new MetricsEndpoint(endpoint, (c) => responseFactory(provider.CurrentMetricsData, this.healthStatus, c));
             this.endpoints.Add(metricsEndpoint);
             return this;
         }

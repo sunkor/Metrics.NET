@@ -10,9 +10,9 @@ namespace Metrics.Tests.Visualization
         [Fact]
         public void MetricsEndpoint_CannotCreateWithEmptyPath()
         {
-            var action1 = new Action(() => new MetricsEndpoint("", () => "test", "text/plain"));
-            var action2 = new Action(() => new MetricsEndpoint(" ", () => "test", "text/plain"));
-            var action3 = new Action(() => new MetricsEndpoint("/", () => "test", "text/plain"));
+            var action1 = new Action(() => new MetricsEndpoint("", c => new MetricsEndpointResponse("test", "text/plain")));
+            var action2 = new Action(() => new MetricsEndpoint(" ", c => new MetricsEndpointResponse("test", "text/plain")));
+            var action3 = new Action(() => new MetricsEndpoint("/", c => new MetricsEndpointResponse("test", "text/plain")));
 
             action1.ShouldThrow<ArgumentException>();
             action2.ShouldThrow<ArgumentException>();
@@ -22,11 +22,11 @@ namespace Metrics.Tests.Visualization
         [Fact]
         public void MetricsEndpoint_PathAlwaysStartsWithForwardSlash()
         {
-            var endpoint1 = new MetricsEndpoint("test", () => "test", "text/plain");
+            var endpoint1 = new MetricsEndpoint("test", c => new MetricsEndpointResponse("test", "text/plain"));
             endpoint1.Endpoint.StartsWith("/").Should().BeTrue();
             endpoint1.Endpoint.StartsWith("//").Should().BeFalse();
 
-            var endpoint2 = new MetricsEndpoint("/test", () => "test", "text/plain");
+            var endpoint2 = new MetricsEndpoint("/test", c => new MetricsEndpointResponse("test", "text/plain"));
             endpoint2.Endpoint.StartsWith("/").Should().BeTrue();
             endpoint2.Endpoint.StartsWith("//").Should().BeFalse();
         }

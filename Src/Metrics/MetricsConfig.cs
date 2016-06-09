@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
@@ -7,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Metrics.Logging;
 using Metrics.MetricData;
+using Metrics.Reporters;
 using Metrics.Reports;
 using Metrics.Visualization;
 
@@ -53,12 +53,24 @@ namespace Metrics
                 this.healthStatus = HealthChecks.GetStatus;
                 this.reports = new MetricsReports(this.context.DataProvider, this.healthStatus);
                 this.endpointReports = new MetricsEndpointReports(this.context.DataProvider, this.healthStatus);
+                RegisterDefaultEndpoints();
+
                 this.context.Advanced.ContextDisabled += (s, e) =>
                 {
                     this.isDisabled = true;
                     DisableAllReports();
                 };
             }
+        }
+
+        private void RegisterDefaultEndpoints()
+        {
+            this.endpointReports.WithTextReportEndpoint("/text");
+            this.endpointReports.WithJsonHealthReport("/health");
+            this.endpointReports.WithJsonHealthReport("/v1/health");
+            this.endpointReports.WithJsonV1Report("/v1/json");
+            this.endpointReports.WithJsonV2Report("/v2/json");
+            this.endpointReports.WithJsonReport("/json");
         }
 
         /// <summary>
@@ -84,8 +96,7 @@ namespace Metrics
                 return this;
             }
 
-            var endpoint = MetricsHttpListener.StartHttpListenerAsync(httpUriPrefix, this.context.DataProvider.WithFilter(filter),
-                this.healthStatus, () => this.endpointReports.Endpoints, this.httpEndpointCancellation.Token, maxRetries);
+            var endpoint = MetricsHttpListener.StartHttpListenerAsync(httpUriPrefix, () => this.endpointReports.Endpoints, this.httpEndpointCancellation.Token, maxRetries);
             this.httpEndpoints.Add(httpUriPrefix, endpoint);
 
             return this;

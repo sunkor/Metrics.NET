@@ -17,7 +17,7 @@ namespace Metrics.Tests.Visualization
         private static Task<MetricsHttpListener> StartListener(string endpoint)
         {
             var context = new TestContext();
-            return MetricsHttpListener.StartHttpListenerAsync(Endpoint(endpoint), context.DataProvider, () => new HealthStatus(), () => Enumerable.Empty<MetricsEndpoint>(), CancellationToken.None);
+            return MetricsHttpListener.StartHttpListenerAsync(Endpoint(endpoint), () => Enumerable.Empty<MetricsEndpoint>(), CancellationToken.None);
         }
 
         [Fact]

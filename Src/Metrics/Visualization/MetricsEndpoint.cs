@@ -1,43 +1,26 @@
 ﻿using System;
-using System.Text;
+using System.Net;
 
 namespace Metrics.Visualization
 {
     public sealed class MetricsEndpoint
     {
-        private readonly Func<string> contentFactory;
+        private readonly Func<HttpListenerContext, MetricsEndpointResponse> responseFactory;
 
         public readonly string Endpoint;
-        public readonly string ContentType;
-        public readonly Encoding Encoding;
-        public string ProduceContent() => this.contentFactory();
 
-        public MetricsEndpoint(string endpoint, Func<string> contentFactory, string contentType)
-            : this(endpoint, contentFactory, contentType, Encoding.UTF8) { }
+        public MetricsEndpointResponse ProduceResponse(HttpListenerContext context) => this.responseFactory(context);
 
-
-        public MetricsEndpoint(string endpoint, Func<string> contentFactory, string contentType, Encoding encoding)
+        public MetricsEndpoint(string endpoint, Func<HttpListenerContext, MetricsEndpointResponse> responseFactory)
         {
-            if (contentFactory == null)
+            if (responseFactory == null)
             {
-                throw new ArgumentNullException(nameof(contentFactory));
-            }
-
-            if (string.IsNullOrWhiteSpace(contentType))
-            {
-                throw new ArgumentException("Invalid content type");
-            }
-
-            if (encoding == null)
-            {
-                throw new ArgumentNullException(nameof(encoding));
+                throw new ArgumentNullException(nameof(responseFactory));
             }
 
             this.Endpoint = NormalizeEndpoint(endpoint);
-            this.ContentType = contentType;
-            this.Encoding = encoding;
 
-            this.contentFactory = contentFactory;
+            this.responseFactory = responseFactory;
         }
 
         private static string NormalizeEndpoint(string endpoint)

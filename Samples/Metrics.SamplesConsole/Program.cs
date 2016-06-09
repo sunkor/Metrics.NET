@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Text;
 using Metrics.Samples;
 using Metrics.Utils;
+using Metrics.Visualization;
 
 namespace Metrics.SamplesConsole
 {
@@ -17,7 +17,7 @@ namespace Metrics.SamplesConsole
                 .WithReporting(config => config
                     .WithConsoleReport(TimeSpan.FromSeconds(30)))
                 .WithEndpointReporting(config => config
-                    .WithEndpointReport("/test", (d, h) => "test", "text/plain", Encoding.UTF8));
+                    .WithEndpointReport("/test", (d, h, c) => new MetricsEndpointResponse("test", "text/plain")));
 
             using (var scheduler = new ActionScheduler())
             {
