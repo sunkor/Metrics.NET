@@ -14,19 +14,23 @@ namespace Metrics.Visualization
         public MetricsEndpointResponse(string content, string contentType)
             : this(content, contentType, Encoding.UTF8) { }
 
-        public MetricsEndpointResponse(string content, string contentType, Encoding encoding)
-            : this(content, contentType, encoding, 200, "OK") { }
-
-        public MetricsEndpointResponse(string content, string contentType, Encoding encoding, int statusCode, string statusCodeDescription)
+        public MetricsEndpointResponse(string content, string contentType, Encoding encoding, int statusCode = 200, string statusCodeDescription = "OK")
         {
+            if (content == null)
+            {
+                throw new ArgumentNullException(nameof(content));
+            }
             if (string.IsNullOrWhiteSpace(contentType))
             {
                 throw new ArgumentException("Invalid content type");
             }
-
             if (encoding == null)
             {
                 throw new ArgumentNullException(nameof(encoding));
+            }
+            if (statusCodeDescription == null)
+            {
+                throw new ArgumentNullException(nameof(statusCodeDescription));
             }
 
             this.Content = content;

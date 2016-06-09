@@ -58,18 +58,13 @@ namespace Metrics.Reporters
             return reports.WithEndpointReport(endpoint, GetJsonResponse);
         }
 
-        public static MetricsEndpointResponse GetJsonResponse(MetricsData data, Func<HealthStatus> healthStatus, HttpListenerContext context)
+        private static MetricsEndpointResponse GetJsonResponse(MetricsData data, Func<HealthStatus> healthStatus, HttpListenerContext context)
         {
             var acceptHeader = context.Request.Headers["Accept"] ?? string.Empty;
 
-            if (acceptHeader.Contains(JsonBuilderV2.MetricsMimeType))
-            {
-                return GetJsonV2Response(data, healthStatus, context);
-            }
-            else
-            {
-                return GetJsonV1Response(data, healthStatus, context);
-            }
+            return acceptHeader.Contains(JsonBuilderV2.MetricsMimeType)
+                ? GetJsonV2Response(data, healthStatus, context)
+                : GetJsonV1Response(data, healthStatus, context);
         }
     }
 }
