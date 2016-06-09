@@ -11,13 +11,12 @@ namespace Metrics.SamplesConsole
         {
             //Metric.CompletelyDisableMetrics();
             Metric.Config
-                .WithHttpEndpoint("http://localhost:1234/metrics/")
+                .WithHttpEndpoint("http://localhost:1234/metrics/", config => config
+                    .WithEndpointReport("/test", (d, h, c) => new MetricsEndpointResponse("test", "text/plain")))
                 .WithAllCounters()
                 .WithInternalMetrics()
                 .WithReporting(config => config
-                    .WithConsoleReport(TimeSpan.FromSeconds(30)))
-                .WithEndpointReporting(config => config
-                    .WithEndpointReport("/test", (d, h, c) => new MetricsEndpointResponse("test", "text/plain")));
+                    .WithConsoleReport(TimeSpan.FromSeconds(30)));
 
             using (var scheduler = new ActionScheduler())
             {

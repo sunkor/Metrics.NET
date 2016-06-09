@@ -20,24 +20,24 @@ namespace Metrics.Visualization
         private readonly HttpListener httpListener;
         private readonly CancellationTokenSource cts;
         private readonly string prefixPath;
-        private readonly Func<IEnumerable<MetricsEndpoint>> endpointProvider;
+        private readonly IEnumerable<MetricsEndpoint> endpoints;
 
         private Task processingTask;
 
         private static readonly Timer timer = Metric.Internal.Context("HTTP").Timer("Request", Unit.Requests);
         private static readonly Meter errors = Metric.Internal.Context("HTTP").Meter("Request Errors", Unit.Errors);
 
-        public MetricsHttpListener(string listenerUriPrefix, Func<IEnumerable<MetricsEndpoint>> endpointProvider, CancellationToken token)
+        public MetricsHttpListener(string listenerUriPrefix, IEnumerable<MetricsEndpoint> endpoints, CancellationToken token)
         {
             this.cts = CancellationTokenSource.CreateLinkedTokenSource(token);
 
             this.prefixPath = ParsePrefixPath(listenerUriPrefix);
             this.httpListener = new HttpListener();
             this.httpListener.Prefixes.Add(listenerUriPrefix);
-            this.endpointProvider = endpointProvider;
+            this.endpoints = endpoints;
         }
 
-        public static Task<MetricsHttpListener> StartHttpListenerAsync(string httpUriPrefix, Func<IEnumerable<MetricsEndpoint>> endpointProvider, CancellationToken token, int maxRetries = 1)
+        public static Task<MetricsHttpListener> StartHttpListenerAsync(string httpUriPrefix, IEnumerable<MetricsEndpoint> endpoints, CancellationToken token, int maxRetries = 1)
         {
             return Task.Factory.StartNew(async () =>
             {
@@ -47,7 +47,7 @@ namespace Metrics.Visualization
                 {
                     try
                     {
-                        listener = new MetricsHttpListener(httpUriPrefix, endpointProvider, token);
+                        listener = new MetricsHttpListener(httpUriPrefix, endpoints, token);
                         listener.Start();
                         if (remainingRetries != maxRetries)
                         {
@@ -156,7 +156,7 @@ namespace Metrics.Visualization
             WriteNotFound(context);
         }
 
-        private bool TryProcessFixedEndpoints(HttpListenerContext context, string urlPath)
+        private static bool TryProcessFixedEndpoints(HttpListenerContext context, string urlPath)
         {
             switch (urlPath)
             {
@@ -185,7 +185,7 @@ namespace Metrics.Visualization
 
         private bool TryProcessDynamicEndpoints(HttpListenerContext context, string urlPath)
         {
-            foreach (var endpoint in this.endpointProvider())
+            foreach (var endpoint in this.endpoints)
             {
                 if (endpoint.Endpoint.Equals(urlPath, StringComparison.InvariantCultureIgnoreCase))
                 {

@@ -13,7 +13,7 @@ namespace Metrics.Reports
 
         private readonly List<MetricsEndpoint> endpoints = new List<MetricsEndpoint>();
 
-        internal IReadOnlyList<MetricsEndpoint> Endpoints => this.endpoints;
+        internal IEnumerable<MetricsEndpoint> Endpoints => this.endpoints;
 
         public MetricsEndpointReports(MetricsDataProvider metricsDataProvider, Func<HealthStatus> healthStatus)
         {
@@ -21,10 +21,9 @@ namespace Metrics.Reports
             this.healthStatus = healthStatus;
         }
 
-        public MetricsEndpointReports WithEndpointReport(string endpoint, Func<MetricsData, Func<HealthStatus>, HttpListenerContext, MetricsEndpointResponse> responseFactory, MetricsFilter filter = null)
+        public MetricsEndpointReports WithEndpointReport(string endpoint, Func<MetricsData, Func<HealthStatus>, HttpListenerContext, MetricsEndpointResponse> responseFactory)
         {
-            var provider = this.metricsDataProvider.WithFilter(filter);
-            var metricsEndpoint = new MetricsEndpoint(endpoint, (c) => responseFactory(provider.CurrentMetricsData, this.healthStatus, c));
+            var metricsEndpoint = new MetricsEndpoint(endpoint, (c) => responseFactory(this.metricsDataProvider.CurrentMetricsData, this.healthStatus, c));
             this.endpoints.Add(metricsEndpoint);
             return this;
         }

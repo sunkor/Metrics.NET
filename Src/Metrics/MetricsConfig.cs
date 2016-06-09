@@ -20,7 +20,6 @@ namespace Metrics
 
         private readonly MetricsContext context;
         private readonly MetricsReports reports;
-        private readonly MetricsEndpointReports endpointReports;
 
         private Func<HealthStatus> healthStatus;
 
@@ -52,8 +51,6 @@ namespace Metrics
             {
                 this.healthStatus = HealthChecks.GetStatus;
                 this.reports = new MetricsReports(this.context.DataProvider, this.healthStatus);
-                this.endpointReports = new MetricsEndpointReports(this.context.DataProvider, this.healthStatus);
-                RegisterDefaultEndpoints();
 
                 this.context.Advanced.ContextDisabled += (s, e) =>
                 {
@@ -61,16 +58,6 @@ namespace Metrics
                     DisableAllReports();
                 };
             }
-        }
-
-        private void RegisterDefaultEndpoints()
-        {
-            this.endpointReports.WithTextReportEndpoint("/text");
-            this.endpointReports.WithJsonHealthReport("/health");
-            this.endpointReports.WithJsonHealthReport("/v1/health");
-            this.endpointReports.WithJsonV1Report("/v1/json");
-            this.endpointReports.WithJsonV2Report("/v2/json");
-            this.endpointReports.WithJsonReport("/json");
         }
 
         /// <summary>
@@ -85,6 +72,22 @@ namespace Metrics
         /// <returns>Chain-able configuration object.</returns>
         public MetricsConfig WithHttpEndpoint(string httpUriPrefix, MetricsFilter filter = null, int maxRetries = 3)
         {
+            return WithHttpEndpoint(httpUriPrefix, _ => { }, filter, maxRetries);
+        }
+
+        /// <summary>
+        /// Create HTTP endpoint where metrics will be available in various formats:
+        /// GET / => visualization application
+        /// GET /json => metrics serialized as JSON
+        /// GET /text => metrics in human readable text format
+        /// </summary>
+        /// <param name="httpUriPrefix">prefix where to start HTTP endpoint</param>
+        /// <param name="reportsConfig">Endpoint reports configuration</param>
+        /// <param name="filter">Only report metrics that match the filter.</param> 
+        /// <param name="maxRetries">maximum number of attempts to start the http listener. Note the retry time between attempts is dependent on this value</param>
+        /// <returns>Chain-able configuration object.</returns>
+        public MetricsConfig WithHttpEndpoint(string httpUriPrefix, Action<MetricsEndpointReports> reportsConfig, MetricsFilter filter = null, int maxRetries = 3)
+        {
             if (this.isDisabled)
             {
                 return this;
@@ -96,10 +99,25 @@ namespace Metrics
                 return this;
             }
 
-            var endpoint = MetricsHttpListener.StartHttpListenerAsync(httpUriPrefix, () => this.endpointReports.Endpoints, this.httpEndpointCancellation.Token, maxRetries);
+            var endpointReports = new MetricsEndpointReports(this.context.DataProvider.WithFilter(filter), this.healthStatus);
+            RegisterDefaultEndpoints(endpointReports);
+            reportsConfig(endpointReports);
+
+            var endpoint = MetricsHttpListener.StartHttpListenerAsync(httpUriPrefix, endpointReports.Endpoints, this.httpEndpointCancellation.Token, maxRetries);
             this.httpEndpoints.Add(httpUriPrefix, endpoint);
 
             return this;
+        }
+
+        private static void RegisterDefaultEndpoints(MetricsEndpointReports endpointReports)
+        {
+            endpointReports
+                .WithTextReportEndpoint("/text")
+                .WithJsonHealthReport("/health")
+                .WithJsonHealthReport("/v1/health")
+                .WithJsonV1Report("/v1/json")
+                .WithJsonV2Report("/v2/json")
+                .WithJsonReport("/json");
         }
 
         /// <summary>
@@ -170,16 +188,6 @@ namespace Metrics
             if (!this.isDisabled)
             {
                 reportsConfig(this.reports);
-            }
-
-            return this;
-        }
-
-        public MetricsConfig WithEndpointReporting(Action<MetricsEndpointReports> reportsConfig)
-        {
-            if (!this.isDisabled)
-            {
-                reportsConfig(this.endpointReports);
             }
 
             return this;
