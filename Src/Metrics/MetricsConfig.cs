@@ -112,7 +112,7 @@ namespace Metrics
         private static void RegisterDefaultEndpoints(MetricsEndpointReports endpointReports)
         {
             endpointReports
-                .WithTextReportEndpoint("/text")
+                .WithTextReport("/text")
                 .WithJsonHealthReport("/health")
                 .WithJsonHealthReport("/v1/health")
                 .WithJsonV1Report("/v1/json")

@@ -8,9 +8,9 @@ using Metrics.Visualization;
 
 namespace Metrics.Reporters
 {
-    public static class ReporterConfig
+    internal static class EndpointReporterConfig
     {
-        public static MetricsEndpointReports WithTextReportEndpoint(this MetricsEndpointReports reports, string endpoint)
+        public static MetricsEndpointReports WithTextReport(this MetricsEndpointReports reports, string endpoint)
         {
             return reports.WithEndpointReport(endpoint, (d, h, c) => new MetricsEndpointResponse(StringReport.RenderMetrics(d, h), "text/plain"));
         }
