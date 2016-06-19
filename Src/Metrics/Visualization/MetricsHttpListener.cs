@@ -20,7 +20,7 @@ namespace Metrics.Visualization
         private readonly HttpListener httpListener;
         private readonly CancellationTokenSource cts;
         private readonly string prefixPath;
-        private readonly IEnumerable<MetricsEndpoint> endpoints;
+        private readonly MetricsEndpointHandler endpointHandler;
 
         private Task processingTask;
 
@@ -34,7 +34,7 @@ namespace Metrics.Visualization
             this.prefixPath = ParsePrefixPath(listenerUriPrefix);
             this.httpListener = new HttpListener();
             this.httpListener.Prefixes.Add(listenerUriPrefix);
-            this.endpoints = endpoints;
+            this.endpointHandler = new MetricsEndpointHandler(endpoints);
         }
 
         public static Task<MetricsHttpListener> StartHttpListenerAsync(string httpUriPrefix, IEnumerable<MetricsEndpoint> endpoints, CancellationToken token, int maxRetries = 1)
@@ -185,21 +185,18 @@ namespace Metrics.Visualization
 
         private bool TryProcessDynamicEndpoints(HttpListenerContext context, string urlPath)
         {
-            foreach (var endpoint in this.endpoints)
+            var response = this.endpointHandler.Process(urlPath, context);
+            if (response != null)
             {
-                if (endpoint.Endpoint.Equals(urlPath, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    WriteEndpoint(endpoint, context);
-                    return true;
-                }
+                WriteEndpointResponse(response, context);
+                return true;
             }
 
             return false;
         }
 
-        private static void WriteEndpoint(MetricsEndpoint endpoint, HttpListenerContext context)
+        private static void WriteEndpointResponse(MetricsEndpointResponse response, HttpListenerContext context)
         {
-            var response = endpoint.ProduceResponse(context);
             WriteString(context, response.Content, response.ContentType, response.StatusCode, response.StatusCodeDescription, response.Encoding);
         }
 

@@ -23,6 +23,12 @@ namespace Metrics.Visualization
             this.responseFactory = responseFactory;
         }
 
+        public bool IsMatch(string matchWith)
+        {
+            var normalizedMatchWith = NormalizeEndpoint(matchWith);
+            return string.Equals(this.Endpoint, normalizedMatchWith, StringComparison.InvariantCultureIgnoreCase);
+        }
+
         private static string NormalizeEndpoint(string endpoint)
         {
             if (string.IsNullOrWhiteSpace(endpoint) || endpoint == "/")
