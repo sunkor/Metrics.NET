@@ -1,3 +1,6 @@
+###0.4.0-pre / 2016-06-20
+* support for configuring endpoint reports
+
 ###0.3.7 / 2016-05-31
 * fixed AppEnvironment.Current when Assembly.GetEntryAssembly() returns null
 
