@@ -870,7 +870,9 @@ namespace Metrics.Logging.LogProviders
 
         internal class NLogLogger
         {
+#pragma warning disable 414
             private readonly dynamic _logger;
+#pragma warning restore 414
 
             internal NLogLogger(dynamic logger)
             {
