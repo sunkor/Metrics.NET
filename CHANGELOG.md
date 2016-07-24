@@ -1,3 +1,7 @@
+###0.4.1-pre / 2016-07-24
+* fixed issue with timer metric not using the uservalue when marking the interal meter (@epeshk)
+* updated liblog to the latest version (@tsibelman)
+
 ###0.4.0-pre / 2016-06-20
 * support for configuring endpoint reports
 
