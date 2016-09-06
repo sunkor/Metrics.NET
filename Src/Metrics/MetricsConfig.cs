@@ -248,7 +248,6 @@ namespace Metrics
             {
                 ConfigureCsvReports();
                 ConfigureHttpListener();
-                ConfigureGraphiteReporter();
             }
         }
 
@@ -289,30 +288,6 @@ namespace Metrics
             catch (Exception x)
             {
                 MetricsErrorHandler.Handle(x, "Invalid Metrics Configuration: Metrics.CSV.Path must be a valid path and Metrics.CSV.Interval.Seconds must be an integer > 0 ");
-            }
-        }
-
-        private void ConfigureGraphiteReporter()
-        {
-            try
-            {
-                var graphiteMetricsUri = ConfigurationManager.AppSettings["Metrics.Graphite.Uri"];
-                var graphiteMetricsInterval = ConfigurationManager.AppSettings["Metrics.Graphite.Interval.Seconds"];
-
-                if (!string.IsNullOrEmpty(graphiteMetricsUri) && !string.IsNullOrEmpty(graphiteMetricsInterval))
-                {
-                    Uri uri;
-                    int seconds;
-                    if (Uri.TryCreate(graphiteMetricsUri, UriKind.Absolute, out uri) && int.TryParse(graphiteMetricsInterval, out seconds) && seconds > 0)
-                    {
-                        WithReporting(c => c.WithGraphite(uri, TimeSpan.FromSeconds(seconds)));
-                        log.Debug(() => $"Metrics: Sending Graphite reports to {uri} every {seconds} seconds.");
-                    }
-                }
-            }
-            catch (Exception x)
-            {
-                throw new InvalidOperationException("Invalid Metrics Configuration: Metrics.Graphite.Uri must be a valid absolute URI and Metrics.Graphite.Interval.Seconds must be an integer > 0 ", x);
             }
         }
 
