@@ -19,11 +19,20 @@ namespace Metrics.Visualization
             {
                 if (endpoint.IsMatch(urlPath))
                 {
-                    return endpoint.ProduceResponse(context);
+                    var request = CreateRequest(context);
+                    return endpoint.ProduceResponse(request);
                 }
             }
 
             return null;
+        }
+
+        private static MetricsEndpointRequest CreateRequest(HttpListenerContext context)
+        {
+            var headers = context.Request.Headers
+                .AllKeys.ToDictionary(key => key, key => context.Request.Headers[key]);
+
+            return new MetricsEndpointRequest(headers);
         }
     }
 }

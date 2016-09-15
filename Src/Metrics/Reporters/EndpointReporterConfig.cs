@@ -20,7 +20,7 @@ namespace Metrics.Reporters
             return reports.WithEndpointReport(endpoint, GetHealthResponse);
         }
 
-        private static MetricsEndpointResponse GetHealthResponse(MetricsData data, Func<HealthStatus> healthStatus, HttpListenerContext context)
+        private static MetricsEndpointResponse GetHealthResponse(MetricsData data, Func<HealthStatus> healthStatus, MetricsEndpointRequest request)
         {
             var status = healthStatus();
             var json = JsonHealthChecks.BuildJson(status);
@@ -36,7 +36,7 @@ namespace Metrics.Reporters
             return reports.WithEndpointReport(endpoint, GetJsonV1Response);
         }
 
-        private static MetricsEndpointResponse GetJsonV1Response(MetricsData data, Func<HealthStatus> healthStatus, HttpListenerContext context)
+        private static MetricsEndpointResponse GetJsonV1Response(MetricsData data, Func<HealthStatus> healthStatus, MetricsEndpointRequest request)
         {
             var json = JsonBuilderV1.BuildJson(data);
             return new MetricsEndpointResponse(json, JsonBuilderV1.MetricsMimeType);
@@ -47,7 +47,7 @@ namespace Metrics.Reporters
             return reports.WithEndpointReport(endpoint, GetJsonV2Response);
         }
 
-        private static MetricsEndpointResponse GetJsonV2Response(MetricsData data, Func<HealthStatus> healthStatus, HttpListenerContext context)
+        private static MetricsEndpointResponse GetJsonV2Response(MetricsData data, Func<HealthStatus> healthStatus, MetricsEndpointRequest request)
         {
             var json = JsonBuilderV2.BuildJson(data);
             return new MetricsEndpointResponse(json, JsonBuilderV2.MetricsMimeType);
@@ -58,13 +58,17 @@ namespace Metrics.Reporters
             return reports.WithEndpointReport(endpoint, GetJsonResponse);
         }
 
-        private static MetricsEndpointResponse GetJsonResponse(MetricsData data, Func<HealthStatus> healthStatus, HttpListenerContext context)
+        private static MetricsEndpointResponse GetJsonResponse(MetricsData data, Func<HealthStatus> healthStatus, MetricsEndpointRequest request)
         {
-            var acceptHeader = context.Request.Headers["Accept"] ?? string.Empty;
+            string acceptHeader;
+            if (request.Headers.TryGetValue("Accept", out acceptHeader))
+            {
+                return acceptHeader.Contains(JsonBuilderV2.MetricsMimeType)
+                    ? GetJsonV2Response(data, healthStatus, request)
+                    : GetJsonV1Response(data, healthStatus, request);
+            }
 
-            return acceptHeader.Contains(JsonBuilderV2.MetricsMimeType)
-                ? GetJsonV2Response(data, healthStatus, context)
-                : GetJsonV1Response(data, healthStatus, context);
+            return GetJsonV1Response(data, healthStatus, request);
         }
     }
 }

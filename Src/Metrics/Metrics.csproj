@@ -196,6 +196,7 @@
     <Compile Include="Visualization\FlotWebApp.cs" />
     <Compile Include="Visualization\MetricsEndpoint.cs" />
     <Compile Include="Visualization\MetricsEndpointHandler.cs" />
+    <Compile Include="Visualization\MetricsEndpointRequest.cs" />
     <Compile Include="Visualization\MetricsEndpointResponse.cs" />
     <Compile Include="Visualization\MetricsHttpListener.cs" />
   </ItemGroup>

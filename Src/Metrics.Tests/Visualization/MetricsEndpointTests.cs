@@ -35,7 +35,7 @@ namespace Metrics.Tests.Visualization
         [Fact]
         public void MetricsEndpoint_CanProduceResponse()
         {
-            Func<HttpListenerContext, MetricsEndpointResponse> factory = c => new MetricsEndpointResponse("custom content", "application/custom", Encoding.ASCII, 202, "Accepted");
+            Func<MetricsEndpointRequest, MetricsEndpointResponse> factory = r => new MetricsEndpointResponse("custom content", "application/custom", Encoding.ASCII, 202, "Accepted");
             var endpoint = new MetricsEndpoint("test", factory);
 
             var response = endpoint.ProduceResponse(null);

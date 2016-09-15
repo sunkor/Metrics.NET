@@ -5,13 +5,13 @@ namespace Metrics.Visualization
 {
     public sealed class MetricsEndpoint
     {
-        private readonly Func<HttpListenerContext, MetricsEndpointResponse> responseFactory;
+        private readonly Func<MetricsEndpointRequest, MetricsEndpointResponse> responseFactory;
 
         public readonly string Endpoint;
 
-        public MetricsEndpointResponse ProduceResponse(HttpListenerContext context) => this.responseFactory(context);
+        public MetricsEndpointResponse ProduceResponse(MetricsEndpointRequest request) => this.responseFactory(request);
 
-        public MetricsEndpoint(string endpoint, Func<HttpListenerContext, MetricsEndpointResponse> responseFactory)
+        public MetricsEndpoint(string endpoint, Func<MetricsEndpointRequest, MetricsEndpointResponse> responseFactory)
         {
             if (responseFactory == null)
             {

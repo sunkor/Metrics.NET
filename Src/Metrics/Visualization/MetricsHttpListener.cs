@@ -27,7 +27,7 @@ namespace Metrics.Visualization
         private static readonly Timer timer = Metric.Internal.Context("HTTP").Timer("Request", Unit.Requests);
         private static readonly Meter errors = Metric.Internal.Context("HTTP").Meter("Request Errors", Unit.Errors);
 
-        public MetricsHttpListener(string listenerUriPrefix, IEnumerable<MetricsEndpoint> endpoints, CancellationToken token)
+        private MetricsHttpListener(string listenerUriPrefix, IEnumerable<MetricsEndpoint> endpoints, CancellationToken token)
         {
             this.cts = CancellationTokenSource.CreateLinkedTokenSource(token);
 
