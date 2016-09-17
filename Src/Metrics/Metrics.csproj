@@ -193,6 +193,7 @@
     <Compile Include="Utils\IHideObjectMembers.cs" />
     <Compile Include="Utils\Scheduler.cs" />
     <Compile Include="Utils\TimeUnitExtensions.cs" />
+    <Compile Include="Visualization\AbstractMetricsEndpointHandler.cs" />
     <Compile Include="Visualization\FlotWebApp.cs" />
     <Compile Include="Visualization\MetricsEndpoint.cs" />
     <Compile Include="Visualization\MetricsEndpointHandler.cs" />
