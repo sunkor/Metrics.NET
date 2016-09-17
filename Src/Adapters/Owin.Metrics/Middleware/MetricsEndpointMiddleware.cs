@@ -1,15 +1,15 @@
-﻿using Metrics;
-using Metrics.Json;
-using Metrics.MetricData;
-using Metrics.Reporters;
-using Metrics.Utils;
-using Metrics.Visualization;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Metrics;
+using Metrics.Json;
+using Metrics.MetricData;
+using Metrics.Reporters;
+using Metrics.Utils;
+using Metrics.Visualization;
 
 namespace Owin.Metrics.Middleware
 {
@@ -18,13 +18,16 @@ namespace Owin.Metrics.Middleware
     public class MetricsEndpointMiddleware
     {
         private readonly OwinMetricsEndpointConfig endpointConfig;
+        private readonly OwinMetricsEndpointHandler endpointHandler;
         private readonly MetricsDataProvider dataProvider;
         private readonly Func<HealthStatus> healthStatus;
         private AppFunc next;
 
+
         public MetricsEndpointMiddleware(OwinMetricsEndpointConfig endpointConfig, MetricsDataProvider dataProvider, Func<HealthStatus> healthStatus)
         {
             this.endpointConfig = endpointConfig;
+            this.endpointHandler = new OwinMetricsEndpointHandler(endpointConfig.Endpoints);
             this.dataProvider = dataProvider;
             this.healthStatus = healthStatus;
         }
@@ -67,6 +70,12 @@ namespace Owin.Metrics.Middleware
             if (string.Compare(requestPath, "/" + endpointConfig.MetricsPingEndpointName, StringComparison.InvariantCultureIgnoreCase) == 0 && endpointConfig.MetricsPingEndpointEnabled)
             {
                 return GetPingContent(environment);
+            }
+
+            var response = this.endpointHandler.Process(requestPath, environment);
+            if (response != null)
+            {
+                return WriteResponse(response, environment);
             }
 
             return next(environment);
@@ -126,6 +135,23 @@ namespace Owin.Metrics.Middleware
             environment["owin.ResponseStatusCode"] = (int)code;
 
             await response.WriteAsync(contentBytes, 0, contentBytes.Length);
+        }
+
+        private static async Task WriteResponse(MetricsEndpointResponse response, IDictionary<string, object> environment)
+        {
+            var responseStream = environment["owin.ResponseBody"] as Stream;
+            var headers = environment["owin.ResponseHeaders"] as IDictionary<string, string[]>;
+
+            var contentBytes = Encoding.UTF8.GetBytes(response.Content);
+
+            headers["ContentType"] = new[] { response.ContentType };
+            headers["Cache-Control"] = new[] { "no-cache, no-store, must-revalidate" };
+            headers["Pragma"] = new[] { "no-cache" };
+            headers["Expires"] = new[] { "0" };
+
+            environment["owin.ResponseStatusCode"] = (int)response.StatusCode;
+
+            await responseStream.WriteAsync(contentBytes, 0, contentBytes.Length);
         }
     }
 }

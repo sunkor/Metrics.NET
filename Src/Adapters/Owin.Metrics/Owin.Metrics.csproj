@@ -36,12 +36,13 @@
     <RegisterForComInterop>false</RegisterForComInterop>
     <DocumentationFile>..\..\..\Release\Owin.Metrics.XML</DocumentationFile>
     <NoWarn>1591</NoWarn>
-  </PropertyGroup>  
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Middleware\MetricMiddleware.cs" />
+    <Compile Include="Middleware\OwinMetricsEndpointHandler.cs" />
     <Compile Include="Middleware\TimerForEachRequestMiddleware.cs" />
     <Compile Include="Middleware\PostAndPutRequestSizeHistogramMiddleware.cs" />
     <Compile Include="Middleware\ActiveRequestCounterMiddleware.cs" />

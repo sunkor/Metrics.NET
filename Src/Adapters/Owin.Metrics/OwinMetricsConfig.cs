@@ -1,7 +1,7 @@
-﻿using Metrics;
-using Owin.Metrics.Middleware;
-using System;
+﻿using System;
 using System.Text.RegularExpressions;
+using Metrics;
+using Owin.Metrics.Middleware;
 namespace Owin.Metrics
 {
     public class OwinMetricsConfig
@@ -63,7 +63,7 @@ namespace Owin.Metrics
         /// <returns>Chainable configuration object.</returns>
         public OwinMetricsConfig WithMetricsEndpoint(Action<OwinMetricsEndpointConfig> config)
         {
-            OwinMetricsEndpointConfig endpointConfig = new OwinMetricsEndpointConfig();
+            OwinMetricsEndpointConfig endpointConfig = new OwinMetricsEndpointConfig(this.context.DataProvider, this.healthStatus);
             config(endpointConfig);
             var metricsEndpointMiddleware = new MetricsEndpointMiddleware(endpointConfig, this.context.DataProvider, this.healthStatus);
             this.middlewareRegistration(metricsEndpointMiddleware);

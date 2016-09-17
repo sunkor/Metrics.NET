@@ -1,10 +1,26 @@
 ﻿
+using System;
+using System.Collections.Generic;
+using Metrics;
+using Metrics.MetricData;
+using Metrics.Visualization;
+
 namespace Owin.Metrics
 {
     public class OwinMetricsEndpointConfig
     {
-        public OwinMetricsEndpointConfig()
+        private readonly MetricsDataProvider metricsDataProvider;
+        private readonly Func<HealthStatus> healthStatus;
+
+        private readonly List<MetricsEndpoint> endpoints = new List<MetricsEndpoint>();
+
+        internal IEnumerable<MetricsEndpoint> Endpoints => this.endpoints;
+
+        public OwinMetricsEndpointConfig(MetricsDataProvider metricsDataProvider, Func<HealthStatus> healthStatus)
         {
+            this.metricsDataProvider = metricsDataProvider;
+            this.healthStatus = healthStatus;
+
             MetricsEndpoint();
             MetricsJsonEndpoint();
             MetricsHealthEndpoint();
@@ -91,6 +107,13 @@ namespace Owin.Metrics
         /// The name of the metrics ping endpoint.
         /// </value>
         internal string MetricsPingEndpointName { get; set; }
+
+        public OwinMetricsEndpointConfig WithEndpointReport(string endpoint, Func<MetricsData, Func<HealthStatus>, MetricsEndpointRequest, MetricsEndpointResponse> responseFactory)
+        {
+            var metricsEndpoint = new MetricsEndpoint(endpoint, r => responseFactory(this.metricsDataProvider.CurrentMetricsData, this.healthStatus, r));
+            this.endpoints.Add(metricsEndpoint);
+            return this;
+        }
 
         /// <summary>
         /// Configures the metrics endpoint
