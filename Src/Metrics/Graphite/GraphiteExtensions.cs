@@ -52,34 +52,21 @@ namespace Metrics
 
         public static void WithGraphiteFromConfig(this MetricsReports reports)
         {
-            try
-            {
-                var graphiteMetricsUri = ConfigurationManager.AppSettings["Metrics.Graphite.Uri"];
-                var graphiteMetricsInterval = ConfigurationManager.AppSettings["Metrics.Graphite.Interval.Seconds"];
+            var graphiteMetricsUri = ConfigurationManager.AppSettings["Metrics.Graphite.Uri"];
+            var graphiteMetricsInterval = ConfigurationManager.AppSettings["Metrics.Graphite.Interval.Seconds"];
 
-                if (!string.IsNullOrEmpty(graphiteMetricsUri) && !string.IsNullOrEmpty(graphiteMetricsInterval))
-                {
-                    Uri uri;
-                    int seconds;
-                    if (Uri.TryCreate(graphiteMetricsUri, UriKind.Absolute, out uri) && int.TryParse(graphiteMetricsInterval, out seconds) && seconds > 0)
-                    {
-                        reports.WithGraphite(uri, TimeSpan.FromSeconds(seconds));
-                        log.Debug(() => $"Metrics: Sending Graphite reports to {uri} every {seconds} seconds.");
-                    }
-                    else
-                    {
-                        log.Error(() => "Invalid Metrics Configuration: Metrics.Graphite.Uri must be a valid absolute URI and Metrics.Graphite.Interval.Seconds must be an integer > 0");
-                    }
-                }
-                else
-                {
-                    log.Warn(() => "Invalid Metrics Configuration: Metrics.Graphite.Uri must be a valid absolute URI and Metrics.Graphite.Interval.Seconds must be an integer > 0");
-                }
-            }
-            catch (Exception x)
+            if (!string.IsNullOrEmpty(graphiteMetricsUri) && !string.IsNullOrEmpty(graphiteMetricsInterval))
             {
-                MetricsErrorHandler.Handle(x, "Error while configuring graphite from config");
+                Uri uri;
+                int seconds;
+                if (Uri.TryCreate(graphiteMetricsUri, UriKind.Absolute, out uri) && int.TryParse(graphiteMetricsInterval, out seconds) && seconds > 0)
+                {
+                    reports.WithGraphite(uri, TimeSpan.FromSeconds(seconds));
+                    log.Debug(() => $"Metrics: Sending Graphite reports to {uri} every {seconds} seconds.");
+                }
             }
+
+            throw new InvalidOperationException("Invalid graphite configuration in config file");
         }
     }
 }
