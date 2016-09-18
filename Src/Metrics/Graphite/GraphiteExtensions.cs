@@ -50,7 +50,7 @@ namespace Metrics
             return reports.WithReport(new GraphiteReport(graphiteLink), interval);
         }
 
-        public static void WithGraphiteFromConfig(this MetricsReports reports)
+        public static MetricsReports WithGraphiteFromConfig(this MetricsReports reports)
         {
             var graphiteMetricsUri = ConfigurationManager.AppSettings["Metrics.Graphite.Uri"];
             var graphiteMetricsInterval = ConfigurationManager.AppSettings["Metrics.Graphite.Interval.Seconds"];
@@ -61,8 +61,8 @@ namespace Metrics
                 int seconds;
                 if (Uri.TryCreate(graphiteMetricsUri, UriKind.Absolute, out uri) && int.TryParse(graphiteMetricsInterval, out seconds) && seconds > 0)
                 {
-                    reports.WithGraphite(uri, TimeSpan.FromSeconds(seconds));
                     log.Debug(() => $"Metrics: Sending Graphite reports to {uri} every {seconds} seconds.");
+                    return reports.WithGraphite(uri, TimeSpan.FromSeconds(seconds));
                 }
             }
 
