@@ -264,7 +264,7 @@ namespace Metrics
             }
             catch (Exception x)
             {
-                MetricsErrorHandler.Handle(x, "Invalid Metrics Configuration: Metrics.HttpListener.HttpUriPrefix muse be a valid HttpListener endpoint prefix");
+                MetricsErrorHandler.Handle(x, "Invalid Metrics Configuration: Metrics.HttpListener.HttpUriPrefix must be a valid HttpListener endpoint prefix");
             }
         }
 
@@ -281,13 +281,13 @@ namespace Metrics
                     if (int.TryParse(csvMetricsInterval, out seconds) && seconds > 0)
                     {
                         WithReporting(r => r.WithCSVReports(csvMetricsPath, TimeSpan.FromSeconds(seconds)));
-                        log.Debug($"Metrics: Storing CSV reports in {csvMetricsPath} every {csvMetricsInterval} seconds.");
+                        log.Debug($"Metrics: Storing CSV reports in {csvMetricsPath} every {seconds} seconds.");
                     }
                 }
             }
             catch (Exception x)
             {
-                MetricsErrorHandler.Handle(x, "Invalid Metrics Configuration: Metrics.CSV.Path muse be a valid path and Metrics.CSV.Interval.Seconds must be an integer > 0 ");
+                MetricsErrorHandler.Handle(x, "Invalid Metrics Configuration: Metrics.CSV.Path must be a valid path and Metrics.CSV.Interval.Seconds must be an integer > 0 ");
             }
         }
 
