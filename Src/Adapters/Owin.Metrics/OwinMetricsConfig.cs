@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using Metrics;
+using Metrics.Reports;
 using Owin.Metrics.Middleware;
 namespace Owin.Metrics
 {
@@ -52,7 +53,7 @@ namespace Owin.Metrics
         /// <returns>Chainable configuration object.</returns>
         public OwinMetricsConfig WithMetricsEndpoint()
         {
-            WithMetricsEndpoint(_ => { });
+            WithMetricsEndpoint("metrics", _ => { });
             return this;
         }
 
@@ -61,11 +62,11 @@ namespace Owin.Metrics
         /// </summary>
         /// <param name="config">Action used to configure the Owin Metrics endpoint.</param>
         /// <returns>Chainable configuration object.</returns>
-        public OwinMetricsConfig WithMetricsEndpoint(Action<OwinMetricsEndpointConfig> config)
+        public OwinMetricsConfig WithMetricsEndpoint(string endpointPrefix, Action<MetricsEndpointReports> config)
         {
-            OwinMetricsEndpointConfig endpointConfig = new OwinMetricsEndpointConfig(this.context.DataProvider, this.healthStatus);
+            var endpointConfig = new MetricsEndpointReports(this.context.DataProvider, this.healthStatus);
             config(endpointConfig);
-            var metricsEndpointMiddleware = new MetricsEndpointMiddleware(endpointConfig, this.context.DataProvider, this.healthStatus);
+            var metricsEndpointMiddleware = new MetricsEndpointMiddleware(endpointPrefix, endpointConfig);
             this.middlewareRegistration(metricsEndpointMiddleware);
             return this;
         }

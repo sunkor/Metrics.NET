@@ -4,11 +4,7 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
-using Metrics;
-using Metrics.Json;
-using Metrics.MetricData;
-using Metrics.Reporters;
-using Metrics.Utils;
+using Metrics.Reports;
 using Metrics.Visualization;
 
 namespace Owin.Metrics.Middleware
@@ -17,19 +13,14 @@ namespace Owin.Metrics.Middleware
 
     public class MetricsEndpointMiddleware
     {
-        private readonly OwinMetricsEndpointConfig endpointConfig;
+        private readonly string endpointPrefix;
         private readonly OwinMetricsEndpointHandler endpointHandler;
-        private readonly MetricsDataProvider dataProvider;
-        private readonly Func<HealthStatus> healthStatus;
         private AppFunc next;
 
-
-        public MetricsEndpointMiddleware(OwinMetricsEndpointConfig endpointConfig, MetricsDataProvider dataProvider, Func<HealthStatus> healthStatus)
+        public MetricsEndpointMiddleware(string endpointPrefix, MetricsEndpointReports endpointConfig)
         {
-            this.endpointConfig = endpointConfig;
+            this.endpointPrefix = endpointPrefix.Trim('/');
             this.endpointHandler = new OwinMetricsEndpointHandler(endpointConfig.Endpoints);
-            this.dataProvider = dataProvider;
-            this.healthStatus = healthStatus;
         }
 
         public void Initialize(AppFunc next)
@@ -40,84 +31,30 @@ namespace Owin.Metrics.Middleware
         public Task Invoke(IDictionary<string, object> environment)
         {
             var requestPath = environment["owin.RequestPath"] as string;
-
-            if (string.Compare(requestPath, "/" + endpointConfig.MetricsEndpointName, StringComparison.InvariantCultureIgnoreCase) == 0 && endpointConfig.MetricsEndpointEnabled)
+            var prefix = $"/{this.endpointPrefix}";
+            if (requestPath.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
             {
-                return GetFlotWebApp(environment);
+                requestPath = requestPath.Substring(prefix.Length);
+
+                if (requestPath == "/")
+                {
+                    return GetFlotWebApp(environment);
+                }
+
+                var response = this.endpointHandler.Process(requestPath, environment);
+                if (response != null)
+                {
+                    return WriteResponse(response, environment);
+                }
             }
 
-            if (string.Compare(requestPath, "/" + endpointConfig.MetricsJsonEndpointName, StringComparison.InvariantCultureIgnoreCase) == 0 && endpointConfig.MetricsJsonEndpointEnabled)
-            {
-                return GetJsonContent(environment, this.dataProvider);
-            }
-
-            if (string.Compare(requestPath, "/v2/" + endpointConfig.MetricsJsonEndpointName, StringComparison.InvariantCultureIgnoreCase) == 0 && endpointConfig.MetricsJsonEndpointEnabled)
-            {
-                return GetJsonContentV2(environment, this.dataProvider);
-            }
-
-
-            if (string.Compare(requestPath, "/" + endpointConfig.MetricsHealthEndpointName, StringComparison.InvariantCultureIgnoreCase) == 0 && endpointConfig.MetricsHealthEndpointEnabled)
-            {
-                return GetHealthStatus(environment, this.healthStatus);
-            }
-
-            if (string.Compare(requestPath, "/" + endpointConfig.MetricsTextEndpointName, StringComparison.InvariantCultureIgnoreCase) == 0 && endpointConfig.MetricsTextEndpointEnabled)
-            {
-                return GetAsHumanReadable(environment, this.dataProvider, this.healthStatus);
-            }
-
-            if (string.Compare(requestPath, "/" + endpointConfig.MetricsPingEndpointName, StringComparison.InvariantCultureIgnoreCase) == 0 && endpointConfig.MetricsPingEndpointEnabled)
-            {
-                return GetPingContent(environment);
-            }
-
-            var response = this.endpointHandler.Process(requestPath, environment);
-            if (response != null)
-            {
-                return WriteResponse(response, environment);
-            }
-
-            return next(environment);
+            return this.next(environment);
         }
 
         private static Task GetFlotWebApp(IDictionary<string, object> environment)
         {
             var content = FlotWebApp.GetFlotApp();
             return WriteResponse(environment, content, "application/json");
-        }
-
-        private static Task GetJsonContent(IDictionary<string, object> environment, MetricsDataProvider dataProvider)
-        {
-            var content = JsonBuilderV1.BuildJson(dataProvider.CurrentMetricsData, Clock.Default);
-            return WriteResponse(environment, content, "application/json");
-        }
-
-        private static Task GetJsonContentV2(IDictionary<string, object> environment, MetricsDataProvider metricsDataProvider)
-        {
-            var json = JsonBuilderV2.BuildJson(metricsDataProvider.CurrentMetricsData);
-            return WriteResponse(environment, json, JsonBuilderV2.MetricsMimeType);
-        }
-
-        private static Task GetHealthStatus(IDictionary<string, object> environment, Func<HealthStatus> healthStatus)
-        {
-            var responseStatusCode = HttpStatusCode.OK;
-            var status = healthStatus();
-            var content = JsonHealthChecks.BuildJson(status);
-            if (!status.IsHealthy) responseStatusCode = HttpStatusCode.InternalServerError;
-            return WriteResponse(environment, content, "application/json", responseStatusCode);
-
-        }
-
-        private static Task GetAsHumanReadable(IDictionary<string, object> environment, MetricsDataProvider dataProvider, Func<HealthStatus> healthStatus)
-        {
-            string text = StringReport.RenderMetrics(dataProvider.CurrentMetricsData, healthStatus);
-            return WriteResponse(environment, text, "text/plain");
-        }
-
-        private static Task GetPingContent(IDictionary<string, object> environment)
-        {
-            return WriteResponse(environment, "pong", "text/plain");
         }
 
         private static async Task WriteResponse(IDictionary<string, object> environment, string content, string contentType, HttpStatusCode code = HttpStatusCode.OK)

@@ -14,6 +14,11 @@ namespace Metrics.Visualization
 
         public MetricsEndpointResponse Process(string urlPath, T requestInfo)
         {
+            if (string.IsNullOrEmpty(urlPath))
+            {
+                return null;
+            }
+
             foreach (var endpoint in this.endpoints)
             {
                 if (endpoint.IsMatch(urlPath))

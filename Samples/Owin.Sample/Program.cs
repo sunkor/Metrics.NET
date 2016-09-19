@@ -18,7 +18,7 @@ namespace Owin.Sample
                 {
                     Console.WriteLine("Owin Running at {0}", url);
                     Console.WriteLine("Press any key to exit");
-                    Process.Start(string.Format("{0}metrics", url));
+                    Process.Start(string.Format("{0}metrics/", url));
 
                     SampleMetrics.RunSomeRequests();
 

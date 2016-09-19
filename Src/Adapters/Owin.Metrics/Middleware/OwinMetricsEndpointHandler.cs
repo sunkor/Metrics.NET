@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Metrics.Visualization;
 
 namespace Owin.Metrics.Middleware
@@ -9,7 +10,8 @@ namespace Owin.Metrics.Middleware
 
         protected override MetricsEndpointRequest CreateRequest(IDictionary<string, object> requestInfo)
         {
-            var headers = requestInfo["owin.RequestHeaders"] as IDictionary<string, string>;
+            var owinRequestHeaders = requestInfo["owin.RequestHeaders"] as IDictionary<string, string[]>;
+            var headers = owinRequestHeaders.ToDictionary(p => p.Key, p => p.Value.Single());
 
             return new MetricsEndpointRequest(headers);
         }
