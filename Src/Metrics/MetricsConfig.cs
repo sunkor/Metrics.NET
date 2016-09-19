@@ -100,7 +100,6 @@ namespace Metrics
             }
 
             var endpointReports = new MetricsEndpointReports(this.context.DataProvider.WithFilter(filter), this.healthStatus);
-            RegisterDefaultEndpoints(endpointReports);
             reportsConfig(endpointReports);
 
             var endpoint = MetricsHttpListener.StartHttpListenerAsync(httpUriPrefix, endpointReports.Endpoints, this.httpEndpointCancellation.Token, maxRetries);
@@ -108,18 +107,6 @@ namespace Metrics
 
             return this;
         }
-
-        private static void RegisterDefaultEndpoints(MetricsEndpointReports endpointReports)
-        {
-            endpointReports
-                .WithTextReport("/text")
-                .WithJsonHealthReport("/health")
-                .WithJsonHealthReport("/v1/health")
-                .WithJsonV1Report("/v1/json")
-                .WithJsonV2Report("/v2/json")
-                .WithJsonReport("/json");
-        }
-
         /// <summary>
         /// Configure Metrics library to use a custom health status reporter. By default HealthChecks.GetStatus() is used.
         /// </summary>

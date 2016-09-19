@@ -173,9 +173,6 @@ namespace Metrics.Visualization
                 case "/favicon.ico":
                     WriteFavIcon(context);
                     break;
-                case "/ping":
-                    WritePong(context);
-                    break;
                 default:
                     return false;
             }
@@ -198,11 +195,6 @@ namespace Metrics.Visualization
         private static void WriteEndpointResponse(MetricsEndpointResponse response, HttpListenerContext context)
         {
             WriteString(context, response.Content, response.ContentType, response.StatusCode, response.StatusCodeDescription, response.Encoding);
-        }
-
-        private static void WritePong(HttpListenerContext context)
-        {
-            WriteString(context, "pong", "text/plain");
         }
 
         private static void WriteNotFound(HttpListenerContext context)

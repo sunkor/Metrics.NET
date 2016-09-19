@@ -58,6 +58,11 @@ namespace Metrics.Reporters
             return reports.WithEndpointReport(endpoint, GetJsonResponse);
         }
 
+        public static MetricsEndpointReports WithPing(this MetricsEndpointReports reports)
+        {
+            return reports.WithEndpointReport("/ping", (d, h, r) => new MetricsEndpointResponse("pong", "text/plain"));
+        }
+
         private static MetricsEndpointResponse GetJsonResponse(MetricsData data, Func<HealthStatus> healthStatus, MetricsEndpointRequest request)
         {
             string acceptHeader;

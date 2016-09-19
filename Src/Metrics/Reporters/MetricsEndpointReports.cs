@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using Metrics.MetricData;
+using Metrics.Reporters;
 using Metrics.Visualization;
 
 namespace Metrics.Reports
@@ -13,12 +14,13 @@ namespace Metrics.Reports
 
         private readonly List<MetricsEndpoint> endpoints = new List<MetricsEndpoint>();
 
-        internal IEnumerable<MetricsEndpoint> Endpoints => this.endpoints;
+        public IEnumerable<MetricsEndpoint> Endpoints => this.endpoints;
 
         public MetricsEndpointReports(MetricsDataProvider metricsDataProvider, Func<HealthStatus> healthStatus)
         {
             this.metricsDataProvider = metricsDataProvider;
             this.healthStatus = healthStatus;
+            RegisterDefaultEndpoints();
         }
 
         /// <summary>
@@ -32,6 +34,18 @@ namespace Metrics.Reports
             var metricsEndpoint = new MetricsEndpoint(endpoint, r => responseFactory(this.metricsDataProvider.CurrentMetricsData, this.healthStatus, r));
             this.endpoints.Add(metricsEndpoint);
             return this;
+        }
+
+        private void RegisterDefaultEndpoints()
+        {
+            this
+                .WithTextReport("/text")
+                .WithJsonHealthReport("/health")
+                .WithJsonHealthReport("/v1/health")
+                .WithJsonV1Report("/v1/json")
+                .WithJsonV2Report("/v2/json")
+                .WithJsonReport("/json")
+                .WithPing();
         }
     }
 }
