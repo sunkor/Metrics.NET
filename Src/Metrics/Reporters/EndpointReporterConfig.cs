@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Net;
+using System.Linq;
 using System.Text;
 using Metrics.Json;
 using Metrics.MetricData;
@@ -65,7 +65,7 @@ namespace Metrics.Reporters
 
         private static MetricsEndpointResponse GetJsonResponse(MetricsData data, Func<HealthStatus> healthStatus, MetricsEndpointRequest request)
         {
-            string acceptHeader;
+            string[] acceptHeader;
             if (request.Headers.TryGetValue("Accept", out acceptHeader))
             {
                 return acceptHeader.Contains(JsonBuilderV2.MetricsMimeType)

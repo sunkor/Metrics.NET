@@ -10,8 +10,8 @@ namespace Metrics.Visualization
 
         protected override MetricsEndpointRequest CreateRequest(HttpListenerContext requestInfo)
         {
-            var headers = requestInfo.Request.Headers
-                .AllKeys.ToDictionary(key => key, key => requestInfo.Request.Headers[key]);
+            var headers = requestInfo.Request.Headers.AllKeys
+                .ToDictionary(key => key, key => requestInfo.Request.Headers[key].Split(','));
 
             return new MetricsEndpointRequest(headers);
         }
