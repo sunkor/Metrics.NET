@@ -79,7 +79,7 @@ namespace Owin.Metrics.Middleware
             var responseStream = environment["owin.ResponseBody"] as Stream;
             var headers = environment["owin.ResponseHeaders"] as IDictionary<string, string[]>;
 
-            var contentBytes = Encoding.UTF8.GetBytes(response.Content);
+            var contentBytes = response.Encoding.GetBytes(response.Content);
 
             headers["ContentType"] = new[] { response.ContentType };
             headers["Cache-Control"] = new[] { "no-cache, no-store, must-revalidate" };
