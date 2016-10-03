@@ -8,25 +8,25 @@ using Metrics.Visualization;
 
 namespace Metrics.Reporters
 {
-    internal static class EndpointReporterConfig
+    public static class EndpointReporterConfig
     {
         public static MetricsEndpointReports WithTextReport(this MetricsEndpointReports reports, string endpoint)
         {
             return reports.WithEndpointReport(endpoint, (d, h, c) => new MetricsEndpointResponse(StringReport.RenderMetrics(d, h), "text/plain"));
         }
 
-        public static MetricsEndpointReports WithJsonHealthReport(this MetricsEndpointReports reports, string endpoint)
+        public static MetricsEndpointReports WithJsonHealthReport(this MetricsEndpointReports reports, string endpoint, bool alwaysReturnOkStatusCode = false)
         {
-            return reports.WithEndpointReport(endpoint, GetHealthResponse);
+            return reports.WithEndpointReport(endpoint, (d, h, r) => GetHealthResponse(h, alwaysReturnOkStatusCode));
         }
 
-        private static MetricsEndpointResponse GetHealthResponse(MetricsData data, Func<HealthStatus> healthStatus, MetricsEndpointRequest request)
+        private static MetricsEndpointResponse GetHealthResponse(Func<HealthStatus> healthStatus, bool alwaysReturnOkStatusCode)
         {
             var status = healthStatus();
             var json = JsonHealthChecks.BuildJson(status);
 
-            var httpStatus = status.IsHealthy ? 200 : 500;
-            var httpStatusDescription = status.IsHealthy ? "OK" : "Internal Server Error";
+            var httpStatus = status.IsHealthy || alwaysReturnOkStatusCode ? 200 : 500;
+            var httpStatusDescription = status.IsHealthy || alwaysReturnOkStatusCode ? "OK" : "Internal Server Error";
 
             return new MetricsEndpointResponse(json, JsonHealthChecks.HealthChecksMimeType, Encoding.UTF8, httpStatus, httpStatusDescription);
         }
