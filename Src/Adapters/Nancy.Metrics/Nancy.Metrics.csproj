@@ -47,6 +47,7 @@
     <Compile Include="NancyGlobalMetrics.cs" />
     <Compile Include="NancyMetrics.cs" />
     <Compile Include="NancyMetricsConfig.cs" />
+    <Compile Include="NancyMetricsEndpointHandler.cs" />
     <Compile Include="NancyModuleMetricExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -57,10 +58,12 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Nancy, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\packages\Nancy.1.2.0\lib\net40\Nancy.dll</HintPath>
     </Reference>
+    <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
