@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
 using Metrics.MetricData;
 using Metrics.Reporters;
 using Metrics.Visualization;
@@ -12,9 +11,9 @@ namespace Metrics.Reports
         private readonly MetricsDataProvider metricsDataProvider;
         private readonly Func<HealthStatus> healthStatus;
 
-        private readonly List<MetricsEndpoint> endpoints = new List<MetricsEndpoint>();
+        private readonly Dictionary<string, MetricsEndpoint> endpoints = new Dictionary<string, MetricsEndpoint>();
 
-        public IEnumerable<MetricsEndpoint> Endpoints => this.endpoints;
+        public IEnumerable<MetricsEndpoint> Endpoints => this.endpoints.Values;
 
         public MetricsEndpointReports(MetricsDataProvider metricsDataProvider, Func<HealthStatus> healthStatus)
         {
@@ -32,7 +31,7 @@ namespace Metrics.Reports
         public MetricsEndpointReports WithEndpointReport(string endpoint, Func<MetricsData, Func<HealthStatus>, MetricsEndpointRequest, MetricsEndpointResponse> responseFactory)
         {
             var metricsEndpoint = new MetricsEndpoint(endpoint, r => responseFactory(this.metricsDataProvider.CurrentMetricsData, this.healthStatus, r));
-            this.endpoints.Add(metricsEndpoint);
+            this.endpoints[metricsEndpoint.Endpoint] = metricsEndpoint;
             return this;
         }
 
