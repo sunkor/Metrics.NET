@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Metrics.Visualization
+namespace Metrics.Endpoints
 {
     public sealed class MetricsEndpoint
     {

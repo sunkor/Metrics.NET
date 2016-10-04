@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace Metrics.Visualization
+namespace Metrics.Endpoints
 {
     public sealed class MetricsEndpointResponse
     {

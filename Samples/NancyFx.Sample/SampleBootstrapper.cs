@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Metrics;
-using Metrics.Visualization;
+using Metrics.Endpoints;
 using Nancy;
 using Nancy.Authentication.Stateless;
 using Nancy.Bootstrapper;

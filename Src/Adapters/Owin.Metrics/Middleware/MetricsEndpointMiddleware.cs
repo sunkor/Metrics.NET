@@ -4,8 +4,8 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Metrics.Endpoints;
 using Metrics.Reports;
-using Metrics.Visualization;
 
 namespace Owin.Metrics.Middleware
 {

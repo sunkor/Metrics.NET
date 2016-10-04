@@ -3,7 +3,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Net;
 
-namespace Metrics.Visualization
+namespace Metrics.Endpoints
 {
     public sealed class MetricsEndpointHandler : AbstractMetricsEndpointHandler<HttpListenerContext>
     {

@@ -3,10 +3,10 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Metrics.Visualization;
+using Metrics.Endpoints;
 using Xunit;
 
-namespace Metrics.Tests.Visualization
+namespace Metrics.Tests.Endpoints
 {
     public class MetricsHttpListenerTests
     {

@@ -139,10 +139,10 @@
     <Compile Include="Utils\MetricUnitTests.cs" />
     <Compile Include="Utils\TimeUnitTests.cs" />
     <Compile Include="Sampling\UniformReservoirTests.cs" />
-    <Compile Include="Visualization\FlotVisualizationTests.cs" />
-    <Compile Include="Visualization\MetricsEndpointHandlerTests.cs" />
-    <Compile Include="Visualization\MetricsEndpointTests.cs" />
-    <Compile Include="Visualization\MetricsHttpListenerTests.cs" />
+    <Compile Include="Endpoints\FlotVisualizationTests.cs" />
+    <Compile Include="Endpoints\MetricsEndpointHandlerTests.cs" />
+    <Compile Include="Endpoints\MetricsEndpointTests.cs" />
+    <Compile Include="Endpoints\MetricsHttpListenerTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Adapters\Nancy.Metrics\Nancy.Metrics.csproj">

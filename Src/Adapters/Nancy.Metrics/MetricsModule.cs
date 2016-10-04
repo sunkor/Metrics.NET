@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using Metrics.Endpoints;
 using Metrics.Reports;
-using Metrics.Visualization;
 
 namespace Nancy.Metrics
 {

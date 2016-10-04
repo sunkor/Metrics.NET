@@ -4,11 +4,10 @@ using System.Configuration;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using Metrics.Endpoints;
 using Metrics.Logging;
 using Metrics.MetricData;
-using Metrics.Reporters;
 using Metrics.Reports;
-using Metrics.Visualization;
 
 namespace Metrics
 {

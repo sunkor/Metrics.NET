@@ -1,8 +1,8 @@
-﻿using Metrics;
-using System;
+﻿using System;
 using System.Text.RegularExpressions;
 using System.Web.Http;
-using Metrics.Visualization;
+using Metrics;
+using Metrics.Endpoints;
 using Microsoft.Owin.Cors;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -37,11 +37,11 @@ namespace Owin.Sample
                     {
                         new Regex("(?i)^sampleignore"),
                         new Regex("(?i)^metrics"),
-                        new Regex("(?i)^health"), 
+                        new Regex("(?i)^health"),
                         new Regex("(?i)^json")
                      })
                     .WithMetricsEndpoint("metrics", conf => conf
-                        .WithEndpointReport("/test", (d,h,r) => new MetricsEndpointResponse("text", "text/plain")))
+                        .WithEndpointReport("/test", (d, h, r) => new MetricsEndpointResponse("text", "text/plain")))
                 );
 
             app.UseWebApi(httpconfig);

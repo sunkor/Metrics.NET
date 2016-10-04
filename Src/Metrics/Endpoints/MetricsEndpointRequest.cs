@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Metrics.Visualization
+namespace Metrics.Endpoints
 {
     public class MetricsEndpointRequest
     {

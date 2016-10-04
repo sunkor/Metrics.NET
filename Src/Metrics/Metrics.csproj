@@ -193,16 +193,16 @@
     <Compile Include="Utils\IHideObjectMembers.cs" />
     <Compile Include="Utils\Scheduler.cs" />
     <Compile Include="Utils\TimeUnitExtensions.cs" />
-    <Compile Include="Visualization\AbstractMetricsEndpointHandler.cs" />
-    <Compile Include="Visualization\FlotWebApp.cs" />
-    <Compile Include="Visualization\MetricsEndpoint.cs" />
-    <Compile Include="Visualization\MetricsEndpointHandler.cs" />
-    <Compile Include="Visualization\MetricsEndpointRequest.cs" />
-    <Compile Include="Visualization\MetricsEndpointResponse.cs" />
-    <Compile Include="Visualization\MetricsHttpListener.cs" />
+    <Compile Include="Endpoints\AbstractMetricsEndpointHandler.cs" />
+    <Compile Include="Endpoints\FlotWebApp.cs" />
+    <Compile Include="Endpoints\MetricsEndpoint.cs" />
+    <Compile Include="Endpoints\MetricsEndpointHandler.cs" />
+    <Compile Include="Endpoints\MetricsEndpointRequest.cs" />
+    <Compile Include="Endpoints\MetricsEndpointResponse.cs" />
+    <Compile Include="Endpoints\MetricsHttpListener.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Visualization\index.full.html.gz" />
+    <EmbeddedResource Include="Endpoints\index.full.html.gz" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="..\..\Publishing\metrics_32.png">

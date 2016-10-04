@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Metrics.Visualization
+namespace Metrics.Endpoints
 {
     public abstract class AbstractMetricsEndpointHandler<T>
     {

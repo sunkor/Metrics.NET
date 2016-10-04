@@ -1,7 +1,7 @@
 ﻿using System;
+using Metrics.Endpoints;
 using Metrics.Samples;
 using Metrics.Utils;
-using Metrics.Visualization;
 
 namespace Metrics.SamplesConsole
 {

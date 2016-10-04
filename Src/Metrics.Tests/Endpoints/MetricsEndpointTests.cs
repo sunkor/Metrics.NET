@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Net;
 using System.Text;
 using FluentAssertions;
-using Metrics.Visualization;
+using Metrics.Endpoints;
 using Xunit;
-namespace Metrics.Tests.Visualization
+
+namespace Metrics.Tests.Endpoints
 {
     public class MetricsEndpointTests
     {
