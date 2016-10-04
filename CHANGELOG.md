@@ -1,3 +1,7 @@
+###0.4.2-pre / 2016-09-18
+* graphite report can now be configured from app.config file (@slawwan)
+* fixed owin adapter endpoints content type header (@glennular)
+
 ###0.4.1-pre / 2016-07-24
 * fixed issue with timer metric not using the uservalue when marking the interal meter (@epeshk)
 * updated liblog to the latest version (@tsibelman)
