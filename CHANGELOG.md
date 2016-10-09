@@ -1,3 +1,9 @@
+###0.4.3-pre / 2016-10-09
+* Nancy.Metrics adapter: support for endpoint reports
+* Owin.Metrics adapter: support for endpoint reports
+* decoupled endpoint reports from http listener implementation
+* graphite can now be disabled by omitting config entries (@slawwan)
+
 ###0.4.2-pre / 2016-09-18
 * graphite report can now be configured from app.config file (@slawwan)
 * fixed owin adapter endpoints content type header (@glennular)
