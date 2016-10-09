@@ -9,12 +9,12 @@ namespace Metrics.Endpoints
     public static class FlotWebApp
     {
         private static readonly Assembly thisAssembly = Assembly.GetAssembly(typeof(FlotWebApp));
-        private const string FlotAppResource = "Metrics.Visualization.index.full.html.gz";
-        private const string FavIconResource = "Metrics.Visualization.metrics_32.png";
+        private const string FlotAppResource = "Metrics.Endpoints.index.full.html.gz";
+        private const string FavIconResource = "Metrics.Endpoints.metrics_32.png";
 
         private static string ReadFromEmbededResource()
         {
-            using (var stream = Assembly.GetAssembly(typeof(FlotWebApp)).GetManifestResourceStream("Metrics.Visualization.index.full.html.gz"))
+            using (var stream = Assembly.GetAssembly(typeof(FlotWebApp)).GetManifestResourceStream(FlotAppResource))
             using (var gzip = new GZipStream(stream, CompressionMode.Decompress))
             using (var reader = new StreamReader(gzip))
             {
