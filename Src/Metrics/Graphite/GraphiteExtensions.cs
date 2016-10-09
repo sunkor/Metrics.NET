@@ -58,15 +58,22 @@ namespace Metrics
             if (!string.IsNullOrEmpty(graphiteMetricsUri) && !string.IsNullOrEmpty(graphiteMetricsInterval))
             {
                 Uri uri;
-                int seconds;
-                if (Uri.TryCreate(graphiteMetricsUri, UriKind.Absolute, out uri) && int.TryParse(graphiteMetricsInterval, out seconds) && seconds > 0)
+                if (!Uri.TryCreate(graphiteMetricsUri, UriKind.Absolute, out uri))
                 {
-                    log.Debug(() => $"Metrics: Sending Graphite reports to {uri} every {seconds} seconds.");
-                    return reports.WithGraphite(uri, TimeSpan.FromSeconds(seconds));
+                    throw new Exception("Invalid Metrics Configuration: Metrics.Graphite.Uri must be a valid absolute URI");
                 }
+                int seconds;
+                if (!int.TryParse(graphiteMetricsInterval, out seconds) || seconds <= 0)
+                {
+                    throw new Exception("Invalid Metrics Configuration: Metrics.Graphite.Interval.Seconds Seconds must be an integer > 0");
+                }
+
+                log.Debug(() => $"Metrics: Sending Graphite reports to {uri} every {seconds} seconds.");
+                return reports.WithGraphite(uri, TimeSpan.FromSeconds(seconds));
             }
 
-            throw new InvalidOperationException("Invalid graphite configuration in config file");
+            log.Info(() => "Graphite configuration missing from config file. Graphite reporting will be disabled.");
+            return reports;
         }
     }
 }
