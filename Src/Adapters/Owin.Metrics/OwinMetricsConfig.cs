@@ -53,7 +53,7 @@ namespace Owin.Metrics
         /// <returns>Chainable configuration object.</returns>
         public OwinMetricsConfig WithMetricsEndpoint()
         {
-            WithMetricsEndpoint("metrics", _ => { });
+            WithMetricsEndpoint(_ => { });
             return this;
         }
 
@@ -62,7 +62,7 @@ namespace Owin.Metrics
         /// </summary>
         /// <param name="config">Action used to configure the Owin Metrics endpoint.</param>
         /// <returns>Chainable configuration object.</returns>
-        public OwinMetricsConfig WithMetricsEndpoint(string endpointPrefix, Action<MetricsEndpointReports> config)
+        public OwinMetricsConfig WithMetricsEndpoint(Action<MetricsEndpointReports> config, string endpointPrefix = "metrics")
         {
             var endpointConfig = new MetricsEndpointReports(this.context.DataProvider, this.healthStatus);
             config(endpointConfig);

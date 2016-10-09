@@ -40,8 +40,8 @@ namespace Owin.Sample
                         new Regex("(?i)^health"),
                         new Regex("(?i)^json")
                      })
-                    .WithMetricsEndpoint("metrics", conf => conf
-                        .WithEndpointReport("/test", (d, h, r) => new MetricsEndpointResponse("text", "text/plain")))
+                    .WithMetricsEndpoint(conf => conf
+                        .WithEndpointReport("/test", (d, h, r) => new MetricsEndpointResponse("test", "text/plain")))
                 );
 
             app.UseWebApi(httpconfig);

@@ -36,8 +36,8 @@ namespace NancyFx.Sample
                 //.WithReporter("Resetting Reporter", () => new SampleResettingReporter(), TimeSpan.FromSeconds(5))
                 )
                 .WithNancy(pipelines, config =>
-                    config.WithMetricsModule(conf =>
-                         conf.WithEndpointReport("test", (d, h, r) => new MetricsEndpointResponse("text", "text/plain"))));
+                    config.WithMetricsModule(conf => conf
+                        .WithEndpointReport("test", (d, h, r) => new MetricsEndpointResponse("test", "text/plain"))));
 
             // read remote metrics from NancySample
             //Metric.Advanced.AttachContext("Remote",

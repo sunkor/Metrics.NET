@@ -3,7 +3,7 @@ using Metrics.Endpoints;
 
 namespace Owin.Metrics.Middleware
 {
-    public class OwinMetricsEndpointHandler : AbstractMetricsEndpointHandler<IDictionary<string, object>>
+    internal class OwinMetricsEndpointHandler : AbstractMetricsEndpointHandler<IDictionary<string, object>>
     {
         public OwinMetricsEndpointHandler(IEnumerable<MetricsEndpoint> endpoints) : base(endpoints) { }
 

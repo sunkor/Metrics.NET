@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Metrics.Endpoints
 {
@@ -8,6 +9,11 @@ namespace Metrics.Endpoints
 
         public MetricsEndpointRequest(IDictionary<string, string[]> headers)
         {
+            if (headers == null)
+            {
+                throw new ArgumentNullException(nameof(headers));
+            }
+
             this.Headers = headers;
         }
     }

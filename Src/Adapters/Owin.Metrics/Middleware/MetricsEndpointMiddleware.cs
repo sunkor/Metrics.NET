@@ -19,7 +19,7 @@ namespace Owin.Metrics.Middleware
 
         public MetricsEndpointMiddleware(string endpointPrefix, MetricsEndpointReports endpointConfig)
         {
-            this.endpointPrefix = endpointPrefix.Trim('/');
+            this.endpointPrefix = NormalizePrefix(endpointPrefix);
             this.endpointHandler = new OwinMetricsEndpointHandler(endpointConfig.Endpoints);
         }
 
@@ -31,10 +31,9 @@ namespace Owin.Metrics.Middleware
         public Task Invoke(IDictionary<string, object> environment)
         {
             var requestPath = environment["owin.RequestPath"] as string;
-            var prefix = $"/{this.endpointPrefix}";
-            if (requestPath.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+            if (requestPath.StartsWith(this.endpointPrefix, StringComparison.OrdinalIgnoreCase))
             {
-                requestPath = requestPath.Substring(prefix.Length);
+                requestPath = requestPath.Substring(this.endpointPrefix.Length);
 
                 if (requestPath == "/")
                 {
@@ -49,6 +48,21 @@ namespace Owin.Metrics.Middleware
             }
 
             return this.next(environment);
+        }
+
+        private static string NormalizePrefix(string prefix)
+        {
+            if (string.IsNullOrEmpty(prefix) || prefix == "/")
+            {
+                return string.Empty;
+            }
+
+            if (prefix.StartsWith("/"))
+            {
+                return prefix;
+            }
+
+            return $"/{prefix}";
         }
 
         private static Task GetFlotWebApp(IDictionary<string, object> environment)
