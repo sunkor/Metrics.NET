@@ -10,7 +10,7 @@ namespace Metrics.Tests.Endpoints
         public void MetricsEndpointHandler_CanProcessEndpoint()
         {
             var endpoint = new MetricsEndpoint("test", c => new MetricsEndpointResponse("text", "text/plain"));
-            var handler = new MetricsEndpointHandler(new[] { endpoint });
+            var handler = new TestMetricsEndpointHandler(new[] { endpoint });
 
             var response = handler.Process("test", null);
             response.Should().NotBeNull();
