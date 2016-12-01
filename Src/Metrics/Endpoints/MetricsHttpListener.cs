@@ -198,7 +198,7 @@ namespace Metrics.Endpoints
 
         private static void WriteNotFound(HttpListenerContext context)
         {
-            WriteString(context, NotFoundResponse, "text/plain", 404, "NOT FOUND");
+            WriteString(context, NotFoundResponse, "text/html", 404, "NOT FOUND");
         }
 
         private static void WriteString(HttpListenerContext context, string data, string contentType,
