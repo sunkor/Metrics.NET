@@ -30,7 +30,6 @@ namespace NancyFx.Sample
             StatelessAuthentication.Enable(pipelines, new StatelessAuthenticationConfiguration(AuthenticateUser));
 
             Metric.Config
-                .WithAllCounters()
                 .WithReporting(r =>
                     r.WithConsoleReport(TimeSpan.FromSeconds(30))
                 //.WithReporter("Resetting Reporter", () => new SampleResettingReporter(), TimeSpan.FromSeconds(5))
