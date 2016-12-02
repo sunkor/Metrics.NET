@@ -21,15 +21,13 @@ namespace Metrics.Tests.Endpoints
         }
 
         [Fact]
-        public void MetricsEndpoint_PathAlwaysStartsWithForwardSlash()
+        public void MetricsEndpoint_CanNormalizePath()
         {
             var endpoint1 = new MetricsEndpoint("test", c => new MetricsEndpointResponse("test", "text/plain"));
-            endpoint1.Endpoint.StartsWith("/").Should().BeTrue();
-            endpoint1.Endpoint.StartsWith("//").Should().BeFalse();
+            endpoint1.Endpoint.Should().Be("test");
 
             var endpoint2 = new MetricsEndpoint("/test", c => new MetricsEndpointResponse("test", "text/plain"));
-            endpoint2.Endpoint.StartsWith("/").Should().BeTrue();
-            endpoint2.Endpoint.StartsWith("//").Should().BeFalse();
+            endpoint1.Endpoint.Should().Be("test");
         }
 
         [Fact]

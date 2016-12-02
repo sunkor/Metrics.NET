@@ -35,12 +35,7 @@ namespace Metrics.Endpoints
                 throw new ArgumentException("Endpoint path cannot be empty");
             }
 
-            if (!endpoint.StartsWith("/"))
-            {
-                endpoint = '/' + endpoint;
-            }
-
-            return endpoint;
+            return endpoint.TrimStart('/');
         }
     }
 }
