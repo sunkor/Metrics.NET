@@ -1,3 +1,7 @@
+###0.4.4 / 2016-12-02
+* health checks can now be updated at runtime (@bronsh)
+* fixed the 404 response of core metrics http listener
+
 ###0.4.3-pre / 2016-10-09
 * Nancy.Metrics adapter: support for endpoint reports
 * Owin.Metrics adapter: support for endpoint reports
