@@ -122,5 +122,154 @@ namespace Metrics.Tests.Utils
 
             x.Should().NotBeNull();
         }
+
+        [Fact]
+        public void ActionScheduler_CannotCreateWithInvalidParameter()
+        {
+            var action = new Action(() => new ActionScheduler(-2));
+            action.ShouldThrow<Exception>();
+        }
+
+        [Fact]
+        public void ActionScheduler_DefaultDoesNotTolerateFailures()
+        {
+            using (var scheduler = new ActionScheduler())
+            {
+                Test_NoTolerance(scheduler);
+            }
+        }
+
+        [Fact]
+        public void ActionScheduler_DoesNotTolerateFailures()
+        {
+            using (var scheduler = new ActionScheduler(0))
+            {
+                Test_NoTolerance(scheduler);
+            }
+        }
+
+        private static void Test_NoTolerance(ActionScheduler scheduler)
+        {
+            var actionCounter = 0;
+            var errorCounter = 0;
+
+            Metric.Config.WithErrorHandler(e =>
+            {
+                errorCounter++;
+            });
+
+            scheduler.Start(TimeSpan.FromMilliseconds(10), () =>
+            {
+                if (actionCounter < 3)
+                {
+                    actionCounter++;
+                    throw new Exception();
+                }
+                else
+                {
+                    actionCounter++;
+                }
+            });
+
+            Thread.Sleep(200);
+            scheduler.Stop();
+
+            actionCounter.Should().Be(1);
+            errorCounter.Should().Be(1);
+        }
+
+        [Fact]
+        public void ActionScheduler_ToleratesFailures()
+        {
+            using (var scheduler = new ActionScheduler(3))
+            {
+                var actionCounter = 0;
+                var tcs = new TaskCompletionSource<bool>();
+
+                scheduler.Start(TimeSpan.FromMilliseconds(10), () =>
+                {
+                    if (actionCounter < 3)
+                    {
+                        actionCounter++;
+                        throw new Exception();
+                    }
+                    else
+                    {
+                        actionCounter++;
+                        tcs.SetResult(true);
+                    }
+                });
+
+                tcs.Task.Wait();
+                scheduler.Stop();
+
+                actionCounter.Should().Be(4);
+            }
+        }
+
+        [Fact]
+        public void ActionScheduler_ReportsErrorInCaseOfToleratedFailures()
+        {
+            using (var scheduler = new ActionScheduler(3))
+            {
+                var actionCounter = 0;
+                var tcs = new TaskCompletionSource<bool>();
+                var errorCounter = 0;
+
+                Metric.Config.WithErrorHandler(e =>
+                {
+                    errorCounter++;
+                });
+
+                scheduler.Start(TimeSpan.FromMilliseconds(10), () =>
+                {
+                    if (actionCounter < 3)
+                    {
+                        actionCounter++;
+                        throw new Exception();
+                    }
+                    else
+                    {
+                        actionCounter++;
+                        tcs.SetResult(true);
+                    }
+                });
+
+                tcs.Task.Wait();
+                scheduler.Stop();
+
+                actionCounter.Should().Be(4);
+                errorCounter.Should().Be(3);
+            }
+        }
+
+        [Fact]
+        public void ActionScheduler_ToleratesUnlimitedFailures()
+        {
+            using (var scheduler = new ActionScheduler(-1))
+            {
+                var actionCounter = 0;
+                var tcs = new TaskCompletionSource<bool>();
+
+                scheduler.Start(TimeSpan.FromMilliseconds(10), () =>
+                {
+                    if (actionCounter < 10)
+                    {
+                        actionCounter++;
+                        throw new Exception();
+                    }
+                    else
+                    {
+                        actionCounter++;
+                        tcs.SetResult(true);
+                    }
+                });
+
+                tcs.Task.Wait();
+                scheduler.Stop();
+
+                actionCounter.Should().Be(11);
+            }
+        }
     }
 }
