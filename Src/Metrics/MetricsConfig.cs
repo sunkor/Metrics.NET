@@ -99,8 +99,7 @@ namespace Metrics
 
             if (this.httpEndpoints.ContainsKey(httpUriPrefix))
             {
-                log.WarnFormat("Http uri prefix {0} already registered. Ignoring...", httpUriPrefix);
-                return this;
+                throw new InvalidOperationException($"Http URI prefix {httpUriPrefix} already configured.");
             }
 
             var endpointReports = new MetricsEndpointReports(this.context.DataProvider.WithFilter(filter), this.healthStatus);
