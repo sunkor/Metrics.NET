@@ -1,3 +1,7 @@
+###0.4.6-pre / 2016-12-06
+* reporting can now be configured to be error tolerant (Metrics.Reports.ToleratedConsecutiveFailures config key)
+* an exception is now thrown during startup if an http endpoint is configured more than once
+
 ###0.4.5-pre / 2016-12-02
 * disabling metrics now properly works with config extensions
 * performance counters are no longer being registered when metrics are disabled
