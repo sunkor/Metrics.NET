@@ -151,31 +151,17 @@ namespace Metrics.Tests.Utils
         private static void Test_NoTolerance(ActionScheduler scheduler)
         {
             var actionCounter = 0;
-            var errorCounter = 0;
 
-            Metric.Config.WithErrorHandler(e =>
+            scheduler.Start(TimeSpan.FromMilliseconds(10), t =>
             {
-                errorCounter++;
-            });
-
-            scheduler.Start(TimeSpan.FromMilliseconds(10), () =>
-            {
-                if (actionCounter < 3)
-                {
-                    actionCounter++;
-                    throw new Exception();
-                }
-                else
-                {
-                    actionCounter++;
-                }
+                actionCounter++;
+                throw new Exception();
             });
 
             Thread.Sleep(200);
             scheduler.Stop();
 
             actionCounter.Should().Be(1);
-            errorCounter.Should().Be(1);
         }
 
         [Fact]
@@ -186,7 +172,7 @@ namespace Metrics.Tests.Utils
                 var actionCounter = 0;
                 var tcs = new TaskCompletionSource<bool>();
 
-                scheduler.Start(TimeSpan.FromMilliseconds(10), () =>
+                scheduler.Start(TimeSpan.FromMilliseconds(10), t =>
                 {
                     if (actionCounter < 3)
                     {
@@ -218,15 +204,18 @@ namespace Metrics.Tests.Utils
 
                 Metric.Config.WithErrorHandler(e =>
                 {
-                    errorCounter++;
+                    if (e.Message == "reports_error")
+                    {
+                        errorCounter++;
+                    }
                 });
 
-                scheduler.Start(TimeSpan.FromMilliseconds(10), () =>
+                scheduler.Start(TimeSpan.FromMilliseconds(10), t =>
                 {
                     if (actionCounter < 3)
                     {
                         actionCounter++;
-                        throw new Exception();
+                        throw new Exception("reports_error");
                     }
                     else
                     {
@@ -251,7 +240,7 @@ namespace Metrics.Tests.Utils
                 var actionCounter = 0;
                 var tcs = new TaskCompletionSource<bool>();
 
-                scheduler.Start(TimeSpan.FromMilliseconds(10), () =>
+                scheduler.Start(TimeSpan.FromMilliseconds(10), t =>
                 {
                     if (actionCounter < 10)
                     {
