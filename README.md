@@ -11,6 +11,8 @@
 
 Metrics.NET - a .NET Port, with lots of additional functionality, of the awesome Java [metrics library](https://github.com/dropwizard/metrics) by Coda Hale.
 
+This is a continuation of the original (now unmaintained) project https://github.com/etishor/Metrics.NET.
+
 A lot more [information and documentation are available in the wiki](https://github.com/Recognos/Metrics.NET/wiki).
 
 [Changelog](https://github.com/Recognos/Metrics.NET/blob/master/CHANGELOG.md)
