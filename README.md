@@ -15,7 +15,9 @@ This is a continuation of the original (now unmaintained) project https://github
 
 A lot more [information and documentation are available in the wiki](https://github.com/Recognos/Metrics.NET/wiki).
 
-[Changelog](https://github.com/Recognos/Metrics.NET/blob/master/CHANGELOG.md)
+[Changelog (stable)](https://github.com/Recognos/Metrics.NET/blob/master/CHANGELOG.md)
+
+[Changelog (prerelease)](https://github.com/Recognos/Metrics.NET/blob/dev/CHANGELOG.md)
 
 [List of External Reporters](https://github.com/Recognos/Metrics.NET/wiki/External-Reporters)
 
