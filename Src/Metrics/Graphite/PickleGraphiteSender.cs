@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
 using Metrics.Logging;
 using Metrics.Utils;
@@ -50,11 +49,11 @@ namespace Metrics.Graphite
 
                 this.jar.WritePickleData(this.client.GetStream());
             }
-            catch (Exception x)
+            catch
             {
                 using (this.client) { }
                 this.client = null;
-                MetricsErrorHandler.Handle(x, "Error sending Pickled data to graphite endpoint " + host + ":" + port.ToString());
+                throw;
             }
         }
 
@@ -68,11 +67,11 @@ namespace Metrics.Graphite
                 WriteCurrentJar();
                 this.client?.GetStream().Flush();
             }
-            catch (Exception x)
+            catch
             {
                 using (this.client) { }
                 this.client = null;
-                MetricsErrorHandler.Handle(x, "Error sending Pickled data to graphite endpoint " + host + ":" + port.ToString());
+                throw;
             }
         }
 
