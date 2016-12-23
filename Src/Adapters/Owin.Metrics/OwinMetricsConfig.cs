@@ -82,6 +82,7 @@ namespace Owin.Metrics
         /// Configure Owin metrics endpoint.
         /// </summary>
         /// <param name="config">Action used to configure the Owin Metrics endpoint.</param>
+        /// <param name="endpointPrefix">The relative path the endpoint will be available at.</param>
         /// <returns>Chainable configuration object.</returns>
         public OwinMetricsConfig WithMetricsEndpoint(Action<MetricsEndpointReports> config, string endpointPrefix = "metrics")
         {
