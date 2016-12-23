@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using Metrics.Logging;
@@ -34,16 +33,16 @@ namespace Metrics.Graphite
                 var bytes = Encoding.UTF8.GetBytes(data);
                 this.client.Send(bytes, bytes.Length);
             }
-            catch (Exception x)
+            catch
             {
                 using (this.client) { }
                 this.client = null;
-                MetricsErrorHandler.Handle(x, "Error sending UDP data to graphite endpoint " + host + ":" + port.ToString());
+                throw;
             }
         }
 
         public override void Flush()
-        { 
+        {
         }
 
         private static UdpClient InitClient(string host, int port)

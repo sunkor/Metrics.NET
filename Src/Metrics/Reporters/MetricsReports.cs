@@ -1,11 +1,13 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using Metrics.MetricData;
 using Metrics.Reporters;
+using Metrics.Utils;
+
 namespace Metrics.Reports
 {
-    public sealed class MetricsReports : Utils.IHideObjectMembers, IDisposable
+    public sealed class MetricsReports : IHideObjectMembers, IDisposable
     {
         private readonly MetricsDataProvider metricsDataProvider;
         private readonly Func<HealthStatus> healthStatus;
@@ -26,7 +28,8 @@ namespace Metrics.Reports
 		/// <param name="filter">Only report metrics that match the filter.</param> 
 		public MetricsReports WithReport(MetricsReport report, TimeSpan interval, MetricsFilter filter = null)
         {
-			var newReport = new ScheduledReporter(report, this.metricsDataProvider.WithFilter(filter), this.healthStatus, interval);
+            var toleratedConsecutiveFailures = ReadToleratedFailuresConfig();
+            var newReport = new ScheduledReporter(report, this.metricsDataProvider.WithFilter(filter), this.healthStatus, interval, new ActionScheduler(toleratedConsecutiveFailures));
             this.reports.Add(newReport);
             return this;
         }
@@ -38,7 +41,7 @@ namespace Metrics.Reports
 		/// <param name="filter">Only report metrics that match the filter.</param> 
 		public MetricsReports WithConsoleReport(TimeSpan interval, MetricsFilter filter = null)
         {
-			return WithReport(new ConsoleReport(), interval, filter);
+            return WithReport(new ConsoleReport(), interval, filter);
         }
 
         /// <summary>
@@ -61,7 +64,7 @@ namespace Metrics.Reports
 		/// <param name="filter">Only report metrics that match the filter.</param> 
 		public MetricsReports WithTextFileReport(string filePath, TimeSpan interval, MetricsFilter filter = null)
         {
-			return WithReport(new TextFileReport(filePath), interval, filter);
+            return WithReport(new TextFileReport(filePath), interval, filter);
         }
 
         /// <summary>
@@ -76,6 +79,25 @@ namespace Metrics.Reports
         public void Dispose()
         {
             StopAndClearAllReports();
+        }
+
+        private static int ReadToleratedFailuresConfig()
+        {
+            const string configKey = "Metrics.Reports.ToleratedConsecutiveFailures";
+            var configValue = ConfigurationManager.AppSettings[configKey];
+
+            if (configValue == null)
+            {
+                return 0;
+            }
+
+            int toleratedConsecutiveFailures;
+            if (!int.TryParse(configValue, out toleratedConsecutiveFailures) || toleratedConsecutiveFailures < -1)
+            {
+                throw new InvalidOperationException($"Invalid Metrics Configuration for {configKey}: \"{configValue}\". Value must be an integer >= -1.");
+            }
+
+            return toleratedConsecutiveFailures;
         }
     }
 }

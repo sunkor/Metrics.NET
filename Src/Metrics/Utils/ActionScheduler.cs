@@ -14,6 +14,16 @@ namespace Metrics.Utils
     public sealed class ActionScheduler : Scheduler
     {
         private CancellationTokenSource token;
+        private readonly int toleratedConsecutiveFailures;
+
+        public ActionScheduler(int toleratedConsecutiveFailures = 0)
+        {
+            if (toleratedConsecutiveFailures < -1)
+            {
+                throw new ArgumentException($"{nameof(toleratedConsecutiveFailures)} must be >= -1");
+            }
+            this.toleratedConsecutiveFailures = toleratedConsecutiveFailures;
+        }
 
         public void Start(TimeSpan interval, Action action)
         {
@@ -54,13 +64,14 @@ namespace Metrics.Utils
 
             this.token = new CancellationTokenSource();
 
-            RunScheduler(interval, action, this.token);
+            RunScheduler(interval, action, this.token, this.toleratedConsecutiveFailures);
         }
 
-        private static void RunScheduler(TimeSpan interval, Func<CancellationToken, Task> action, CancellationTokenSource token)
+        private static void RunScheduler(TimeSpan interval, Func<CancellationToken, Task> action, CancellationTokenSource token, int toleratedConsecutiveFailures)
         {
             Task.Factory.StartNew(async () =>
             {
+                var nbFailures = 0;
                 while (!token.IsCancellationRequested)
                 {
                     try
@@ -69,11 +80,19 @@ namespace Metrics.Utils
                         try
                         {
                             await action(token.Token).ConfigureAwait(false);
+                            nbFailures = 0;
                         }
                         catch (Exception x)
                         {
                             MetricsErrorHandler.Handle(x, "Error while executing action scheduler.");
-                            token.Cancel();
+                            if (toleratedConsecutiveFailures >= 0)
+                            {
+                                nbFailures++;
+                                if (nbFailures > toleratedConsecutiveFailures)
+                                {
+                                    token.Cancel();
+                                }
+                            }
                         }
                     }
                     catch (TaskCanceledException) { }

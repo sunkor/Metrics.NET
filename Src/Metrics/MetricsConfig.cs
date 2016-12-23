@@ -71,6 +71,11 @@ namespace Metrics
         /// <returns>Chain-able configuration object.</returns>
         public MetricsConfig WithHttpEndpoint(string httpUriPrefix, MetricsFilter filter = null, int maxRetries = 3)
         {
+            if (this.isDisabled)
+            {
+                return this;
+            }
+
             return WithHttpEndpoint(httpUriPrefix, _ => { }, filter, maxRetries);
         }
 
@@ -94,8 +99,7 @@ namespace Metrics
 
             if (this.httpEndpoints.ContainsKey(httpUriPrefix))
             {
-                log.WarnFormat("Http uri prefix {0} already registered. Ignoring...", httpUriPrefix);
-                return this;
+                throw new InvalidOperationException($"Http URI prefix {httpUriPrefix} already configured.");
             }
 
             var endpointReports = new MetricsEndpointReports(this.context.DataProvider.WithFilter(filter), this.healthStatus);
@@ -190,7 +194,12 @@ namespace Metrics
         /// <returns>Chain-able configuration object.</returns>
         public MetricsConfig WithConfigExtension(Action<MetricsContext, Func<HealthStatus>> extension)
         {
-            return WithConfigExtension((m, h) => { extension(m, h); return this; });
+            if (this.isDisabled)
+            {
+                return this;
+            }
+
+            return WithConfigExtension((m, h) => { extension(m, h); return this; }, () => this);
         }
 
         /// <summary>
@@ -202,8 +211,29 @@ namespace Metrics
         /// </remarks>
         /// <param name="extension">Action to apply extra configuration.</param>
         /// <returns>The result of calling the extension.</returns>
+        [Obsolete("This configuration method ignores the CompletelyDisableMetrics setting. Please use the overload instead.")]
         public T WithConfigExtension<T>(Func<MetricsContext, Func<HealthStatus>, T> extension)
         {
+            return extension(this.context, this.healthStatus);
+        }
+
+        /// <summary>
+        /// This method is used for customizing the metrics configuration.
+        /// The <paramref name="extension"/> will be called with the current MetricsContext and HealthStatus provider.
+        /// </summary>
+        /// <remarks>
+        /// In general you don't need to call this method directly.
+        /// </remarks>
+        /// <param name="extension">Action to apply extra configuration.</param>
+        /// <param name="defaultValueProvider">Default value provider for T, which will be used when metrics are disabled.</param>
+        /// <returns>The result of calling the extension.</returns>
+        public T WithConfigExtension<T>(Func<MetricsContext, Func<HealthStatus>, T> extension, Func<T> defaultValueProvider)
+        {
+            if (this.isDisabled)
+            {
+                return defaultValueProvider();
+            }
+
             return extension(this.context, this.healthStatus);
         }
 
@@ -214,6 +244,11 @@ namespace Metrics
         /// <returns>Chain-able configuration object.</returns>
         public MetricsConfig WithDefaultSamplingType(SamplingType type)
         {
+            if (this.isDisabled)
+            {
+                return this;
+            }
+
             if (type == SamplingType.Default)
             {
                 throw new ArgumentException("Sampling type other than default must be specified", nameof(type));
@@ -224,6 +259,11 @@ namespace Metrics
 
         public MetricsConfig WithInternalMetrics()
         {
+            if (this.isDisabled)
+            {
+                return this;
+            }
+
             Metric.EnableInternalMetrics();
             return this;
         }

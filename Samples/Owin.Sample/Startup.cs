@@ -30,7 +30,6 @@ namespace Owin.Sample
             httpconfig.MessageHandlers.Add(new SetOwinRouteTemplateMessageHandler());
 
             Metric.Config
-                .WithAllCounters()
                 .WithReporting(r => r.WithConsoleReport(TimeSpan.FromSeconds(30)))
                 .WithOwin(middleware => app.Use(middleware), config => config
                     .WithRequestMetricsConfig(c => c.WithAllOwinMetrics(), new[]

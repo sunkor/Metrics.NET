@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -75,11 +76,12 @@ namespace Metrics.Tests.Endpoints
 
 
         [Fact]
-        public void MetricsHttpListener_MetricsConfig_SecondCallToWithHttpEndportDoesNotThrow()
+        public void MetricsHttpListener_MetricsConfig_SecondCallToWithHttpEndpointThrows()
         {
             using (var config = CreateConfig().WithHttpEndpoint("http://localhost:58888/metricstest/HttpListenerTests/sameendpoint/"))
             {
-                config.WithHttpEndpoint("http://localhost:58888/metricstest/HttpListenerTests/sameendpoint/");
+                var action = new Action(() => config.WithHttpEndpoint("http://localhost:58888/metricstest/HttpListenerTests/sameendpoint/"));
+                action.ShouldThrow<Exception>();
             }
         }
 

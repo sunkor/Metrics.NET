@@ -1,6 +1,6 @@
-﻿using Metrics.Json;
+﻿using System;
+using Metrics.Json;
 using Metrics.RemoteMetrics;
-using System;
 
 namespace Metrics
 {
@@ -22,7 +22,7 @@ namespace Metrics
                 throw new InvalidOperationException("You must set a JSON Deserializer by setting Metrics.Config.WithJsonDeserialzier()");
             }
 
-            config.WithConfigExtension((ctx, hs) => ctx.Advanced.AttachContext(name, new RemoteMetricsContext(remoteUri, updateInterval, jsonDeserializer)));
+            config.WithConfigExtension((ctx, hs) => ctx.Advanced.AttachContext(name, new RemoteMetricsContext(remoteUri, updateInterval, jsonDeserializer)), () => false);
             return config;
         }
     }
