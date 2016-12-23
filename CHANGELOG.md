@@ -1,4 +1,4 @@
-###0.4.7-pre / 2016-12-19
+###0.4.7 / 2016-12-23 (0.4.7-pre / 2016-12-19)
 * the Graphite and text file reporters now work with configurable error tolerance
 
 ###0.4.6-pre / 2016-12-06
