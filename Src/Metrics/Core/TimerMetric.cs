@@ -44,8 +44,12 @@ namespace Metrics.Core
             if (nanos >= 0)
             {
                 this.histogram.Update(nanos, userValue);
-                this.meter.Mark(userValue);
                 this.totalRecordedTime.Add(nanos);
+                // Do not save user value in meter, because its only purpose is to provide overall rate metrics.
+                // Unlike meter, user values for histogram are not restricted to come from a finite set, and generally they are unique.
+                // Saving them will cause huge number of sub-meter-per-item allocations inside a meter metric. 
+                // Moreover those sub-meters are useless, since rates-per-item are not reported for timers.
+                this.meter.Mark();
             }
         }
 
