@@ -1,3 +1,6 @@
+###0.4.8-pre / 2017-01-21
+* improved memory allocations in timers: the internal meter no longer records user values (@SkyterX)
+
 ###0.4.7 / 2016-12-23 (0.4.7-pre / 2016-12-19)
 * the Graphite and text file reporters now work with configurable error tolerance
 
