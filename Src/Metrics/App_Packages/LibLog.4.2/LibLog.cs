@@ -36,10 +36,10 @@
 // Define LIBLOG_PROVIDERS_ONLY if your library provides its own logging API and you just want to use the
 // LibLog providers internally to provide built in support for popular logging frameworks.
 
+#define LIBLOG_PUBLIC
 #pragma warning disable 1591
 
 using System.Diagnostics.CodeAnalysis;
-using Metrics.Logging.LogProviders;
 
 [assembly: SuppressMessage("Microsoft.Design", "CA1020:AvoidNamespacesWithFewTypes", Scope = "namespace", Target = "Metrics.Logging")]
 [assembly: SuppressMessage("Microsoft.Design", "CA1026:DefaultParametersShouldNotBeUsed", Scope = "member", Target = "Metrics.Logging.Logger.#Invoke(Metrics.Logging.LogLevel,System.Func`1<System.String>,System.Exception,System.Object[])")]
@@ -743,7 +743,6 @@ namespace Metrics.Logging.LogProviders
     using System.Linq.Expressions;
     using System.Reflection;
 #if !LIBLOG_PORTABLE
-    using System.Text;
 #endif
     using System.Text.RegularExpressions;
 
