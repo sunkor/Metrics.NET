@@ -29,5 +29,5 @@ The original metrics project is released under this therms (https://github.com/d
 Copyright (c) 2010-2013 Coda Hale, Yammer.com
 Published under Apache Software License 2.0, see LICENSE
 
-This library ( Metrics.NET ) is release under Apache 2.0 License ( see LICENSE ) 
-Copyright (c) 2014 Iulian Margarintescu
+This library ( Metrics.NET ) is released under Apache 2.0 License ( see LICENSE ) 
+Copyright (c) 2017 Iulian Margarintescu, The Recognos Metrics.NET Team
