@@ -13,7 +13,7 @@
 		<projectUrl>https://github.com/Recognos/Metrics.NET</projectUrl>
 		<licenseUrl>https://github.com/Recognos/Metrics.NET/blob/master/LICENSE</licenseUrl>
 		<iconUrl>http://www.erata.net/Metrics.NET/metrics_32.png</iconUrl>
-		<tags>nancy, nancyfx, metrics, measurements, charts, timer, histogram, duration, graphite, health checks</tags>
+		<tags>nancy, nancyfx, metrics, measurements, charts, timer, histogram, duration, health checks</tags>
 		<dependencies>
 			<dependency id="Metrics.NET" version="0.4.7" />
 			<dependency id="Nancy" version="1.2.0" />
