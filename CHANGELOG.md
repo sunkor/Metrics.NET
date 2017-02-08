@@ -1,3 +1,6 @@
+###0.5.1-pre 2017-02-08
+* fixed owin adapter endpoints content type header
+
 ###0.5.0-pre 2017-02-04
 * removed the Graphite, Elasticsearch and InfluxDB reporters from the core metrics library. They have been moved to separate repositories and nuget packages.
 
