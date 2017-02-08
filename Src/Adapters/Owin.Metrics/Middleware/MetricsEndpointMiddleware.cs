@@ -78,7 +78,7 @@ namespace Owin.Metrics.Middleware
 
             var contentBytes = Encoding.UTF8.GetBytes(content);
 
-            headers["ContentType"] = new[] { contentType };
+            headers["Content-Type"] = new[] { contentType };
             headers["Cache-Control"] = new[] { "no-cache, no-store, must-revalidate" };
             headers["Pragma"] = new[] { "no-cache" };
             headers["Expires"] = new[] { "0" };
@@ -95,7 +95,7 @@ namespace Owin.Metrics.Middleware
 
             var contentBytes = response.Encoding.GetBytes(response.Content);
 
-            headers["ContentType"] = new[] { response.ContentType };
+            headers["Content-Type"] = new[] { response.ContentType };
             headers["Cache-Control"] = new[] { "no-cache, no-store, must-revalidate" };
             headers["Pragma"] = new[] { "no-cache" };
             headers["Expires"] = new[] { "0" };
