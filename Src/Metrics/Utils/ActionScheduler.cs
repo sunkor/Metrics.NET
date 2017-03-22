@@ -69,7 +69,7 @@ namespace Metrics.Utils
 
         private static void RunScheduler(TimeSpan interval, Func<CancellationToken, Task> action, CancellationTokenSource token, int toleratedConsecutiveFailures)
         {
-            Task.Factory.StartNew(async () =>
+            Task.Run(async () =>
             {
                 var nbFailures = 0;
                 while (!token.IsCancellationRequested)
