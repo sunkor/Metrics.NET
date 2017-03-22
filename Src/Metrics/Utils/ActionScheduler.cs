@@ -41,13 +41,13 @@ namespace Metrics.Utils
             Start(interval, t =>
             {
                 action(t);
-                return Task.FromResult(true);
+                return TaskEx.CompletedTask;
             });
         }
 
         public void Start(TimeSpan interval, Func<Task> action)
         {
-            Start(interval, t => t.IsCancellationRequested ? action() : Task.FromResult(true));
+            Start(interval, t => t.IsCancellationRequested ? action() : TaskEx.CompletedTask);
         }
 
         public void Start(TimeSpan interval, Func<CancellationToken, Task> action)
