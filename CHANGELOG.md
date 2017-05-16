@@ -1,3 +1,6 @@
+###0.5.2-pre / 2017-05-16
+* added scrollbar to the metrics drop-down in the visualization app (@EranOfer)
+
 ###0.5.1 / 2017-05-16 (0.5.1-pre / 2017-02-08)
 * fixed owin adapter endpoints content type header
 
