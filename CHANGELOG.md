@@ -1,4 +1,4 @@
-###0.5.1-pre 2017-02-08
+###0.5.1 / 2017-05-16 (0.5.1-pre / 2017-02-08)
 * fixed owin adapter endpoints content type header
 
 ###0.5.0-pre / 2017-02-04
