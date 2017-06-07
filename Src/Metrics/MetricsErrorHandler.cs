@@ -14,6 +14,8 @@ namespace Metrics
 
         private static readonly bool isMono = Type.GetType("Mono.Runtime") != null;
 
+        static MetricsErrorHandler() { }
+
         private MetricsErrorHandler()
         {
             this.AddHandler((x, msg) => log.ErrorException("Metrics: Unhandled exception in Metrics.NET Library {0} {1}", x, msg, x.Message));
