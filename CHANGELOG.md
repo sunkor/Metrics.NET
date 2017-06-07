@@ -1,3 +1,7 @@
+###0.5.3-pre / 2017-05-16
+* added scrollbar to the metrics drop-down in the visualization app (@EranOfer)
+* fixed potential NullReferenceException when initializing the library (@mcapodici, @SkyterX)
+
 ###0.5.2-pre / 2017-05-16
 * added scrollbar to the metrics drop-down in the visualization app (@EranOfer)
 
