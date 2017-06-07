@@ -17,9 +17,9 @@ namespace Metrics
 
         private static readonly DefaultMetricsContext globalContext;
         private static readonly MetricsConfig config;
-
-        internal static MetricsContext Internal { get; } = new DefaultMetricsContext("Metrics.NET");
-
+        
+        internal static readonly MetricsContext Internal = new DefaultMetricsContext("Metrics.NET");
+        
         static Metric()
         {
             globalContext = new DefaultMetricsContext(GetGlobalContextName());
