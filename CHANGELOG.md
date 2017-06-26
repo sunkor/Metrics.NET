@@ -1,3 +1,6 @@
+###0.5.4 / 2017-06-27
+* fixed the content type for the web app in the owin adapter
+
 ###0.5.3 / 2017-06-15 (0.5.3-pre / 2017-06-08)
 * added scrollbar to the metrics drop-down in the visualization app (@EranOfer)
 * fixed potential NullReferenceException when initializing the library (@mcapodici, @SkyterX)
