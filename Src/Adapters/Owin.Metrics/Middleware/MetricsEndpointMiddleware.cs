@@ -68,7 +68,7 @@ namespace Owin.Metrics.Middleware
         private static Task GetFlotWebApp(IDictionary<string, object> environment)
         {
             var content = FlotWebApp.GetFlotApp();
-            return WriteResponse(environment, content, "application/json");
+            return WriteResponse(environment, content, "text/html");
         }
 
         private static async Task WriteResponse(IDictionary<string, object> environment, string content, string contentType, HttpStatusCode code = HttpStatusCode.OK)
