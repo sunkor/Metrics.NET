@@ -122,6 +122,15 @@ namespace Metrics.Sampling
                 this.@lock.Enter(ref lockTaken);
 
                 var itemWeight = Math.Exp(this.alpha * (timestamp - this.startTime.GetValue()));
+
+                //sunkor
+                //Patch for https://github.com/Recognos/Metrics.NET/issues/80
+                if (double.IsInfinity(itemWeight))
+                {
+                    ResetReservoir();
+                    itemWeight = Math.Exp(this.alpha * (timestamp - this.startTime.GetValue()));
+                }
+
                 var sample = new WeightedSample(value, userValue, itemWeight);
 
                 var random = 0.0;
